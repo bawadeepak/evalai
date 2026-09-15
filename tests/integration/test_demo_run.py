@@ -54,5 +54,7 @@ def test_demo_seed_run_and_documented_counts(settings, ctx, client):
     detail = client.get(f"/api/v1/trials/{trials['data'][0]['id']}").json()["data"]
     assert detail["output"]["stores"]["main"]["backend"] == "demo"
     assert detail["attempts"] and detail["grades"]
+    # The detail's headline outcome is the latest grading run's outcome, not "unknown".
+    assert detail["outcome"] == detail["outcomes"][-1]["outcome"] and detail["outcome"] in ("pass", "fail")
     artifact = client.get(f"/api/v1/artifacts/{detail['output_artifacts'][0]}")
     assert artifact.status_code == 200 and artifact.headers["content-type"].startswith("application/json")

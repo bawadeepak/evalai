@@ -148,11 +148,13 @@ def trial_detail(session, row: Trial) -> dict[str, Any]:
     grades = session.scalars(select(Grade).where(Grade.trial_id == row.id).order_by(Grade.created_at)).all()
     graders = {g.id: g for g in session.scalars(select(GraderVersion).where(
         GraderVersion.id.in_([x.grader_id for x in grades])))}
-    outcomes = session.scalars(select(TrialOutcome).where(TrialOutcome.trial_id == row.id)).all()
+    outcomes = session.scalars(select(TrialOutcome).where(TrialOutcome.trial_id == row.id)
+                               .order_by(TrialOutcome.created_at)).all()
     siblings = session.scalars(select(Trial).where(Trial.run_id == row.run_id, Trial.case_id == row.case_id)
                                .order_by(Trial.candidate_key, Trial.repeat_index)).all()
     return {
-        **trial_brief(row, case_row), "case": case(case_row),
+        # The headline outcome is the latest grading run's; every run's outcome is listed below.
+        **trial_brief(row, case_row, outcomes[-1] if outcomes else None), "case": case(case_row),
         "scenario_contract": run_row.manifest["scenario"], "is_demo": run_row.is_demo,
         "output": row.output, "steps": row.steps, "output_artifacts": row.output_artifacts,
         "state_artifacts": row.state_artifacts, "error": row.error, "selected_attempt_id": row.selected_attempt_id,
