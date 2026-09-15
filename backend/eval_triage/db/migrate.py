@@ -34,15 +34,32 @@ def _quoted(values) -> str:
     return ", ".join(f"'{v}'" for v in sorted(values))
 
 
+#: Tables made immutable by the initial migration (0001). Frozen: a later
+#: migration creates the triggers for the tables it adds (immutable_trigger_ddl),
+#: so replaying 0001 on an empty database never references a missing table.
+INITIAL_IMMUTABLE_TABLES = (
+    "scenario_versions", "dataset_versions", "cases", "target_config_versions", "grader_versions",
+    "release_policies", "calibration_versions", "probability_records", "grades", "trial_outcomes", "reviews",
+    "comparisons", "artifacts", "artifact_refs", "events",
+)
+
+
+def immutable_trigger_ddl(tables) -> list[str]:
+    """UPDATE/DELETE-aborting triggers for the given tables."""
+    return [
+        f"CREATE TRIGGER IF NOT EXISTS {table}_no_{operation.lower()} BEFORE {operation} ON {table} "
+        f"BEGIN SELECT RAISE(ABORT, 'immutable record: {table}'); END"
+        for table in tables for operation in ("UPDATE", "DELETE")
+    ]
+
+
+def drop_immutable_trigger_ddl(tables) -> list[str]:
+    return [f"DROP TRIGGER IF EXISTS {table}_no_{op}" for table in tables for op in ("update", "delete")]
+
+
 def trigger_ddl() -> list[str]:
-    """SQL for immutability triggers, created in the initial migration."""
-    ddl: list[str] = []
-    for table in IMMUTABLE_TABLES:
-        for operation in ("UPDATE", "DELETE"):
-            ddl.append(
-                f"CREATE TRIGGER IF NOT EXISTS {table}_no_{operation.lower()} BEFORE {operation} ON {table} "
-                f"BEGIN SELECT RAISE(ABORT, 'immutable record: {table}'); END"
-            )
+    """SQL for the triggers created in the initial migration."""
+    ddl = immutable_trigger_ddl(INITIAL_IMMUTABLE_TABLES)
     for table, terminal in (("trials", TRIAL_TERMINAL), ("attempts", ATTEMPT_TERMINAL)):
         ddl.append(
             f"CREATE TRIGGER IF NOT EXISTS {table}_terminal_guard BEFORE UPDATE ON {table} "
@@ -61,10 +78,9 @@ def trigger_ddl() -> list[str]:
 
 
 def drop_trigger_ddl() -> list[str]:
-    names = [f"{t}_no_{op}" for t in IMMUTABLE_TABLES for op in ("update", "delete")]
-    names += ["trials_terminal_guard", "trials_no_delete", "attempts_terminal_guard", "attempts_no_delete",
-              "runs_no_delete"]
-    return [f"DROP TRIGGER IF EXISTS {name}" for name in names]
+    names = ["trials_terminal_guard", "trials_no_delete", "attempts_terminal_guard", "attempts_no_delete",
+             "runs_no_delete"]
+    return drop_immutable_trigger_ddl(INITIAL_IMMUTABLE_TABLES) + [f"DROP TRIGGER IF EXISTS {n}" for n in names]
 
 
 @event.listens_for(Session, "before_flush")

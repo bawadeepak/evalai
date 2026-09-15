@@ -38,6 +38,13 @@ class Settings(BaseSettings):
     memoryai_hf_offline: bool = True
     tiktoken_cache_dir: Path | None = None
 
+    # Promptfoo suite runner. Unset means "import only": Eval Triage never installs
+    # or downloads promptfoo. The command is run with ``-c <config> -o <file>`` and
+    # configs must live inside the working directory.
+    promptfoo_command: str | None = None
+    promptfoo_workdir: Path | None = None
+    promptfoo_timeout_seconds: float = 900.0
+
     # Serve the built frontend from the API process when present.
     frontend_dist: Path = REPO_ROOT / "frontend" / "dist"
 

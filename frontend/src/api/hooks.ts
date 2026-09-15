@@ -13,6 +13,8 @@ import type {
   Dataset,
   DatasetDetail,
   ExportRecord,
+  ExternalImport,
+  IntegrationPlugin,
   Grader,
   Health,
   Job,
@@ -235,6 +237,27 @@ export function useReleasePolicies(projectId: string | null) {
     queryKey: ['policies', projectId],
     queryFn: () => data(api.get<ReleasePolicy[]>('/release-policies', { project_id: projectId })),
     enabled: !!projectId,
+  })
+}
+
+export function useIntegrations() {
+  return useQuery({ queryKey: ['integrations'], queryFn: () => data(api.get<IntegrationPlugin[]>('/integrations')) })
+}
+
+export function useExternalImports(projectId: string | null) {
+  return useQuery({
+    queryKey: ['external-imports', projectId],
+    queryFn: () => data(api.get<ExternalImport[]>('/external-imports', { project_id: projectId })),
+    enabled: !!projectId,
+  })
+}
+
+export function useExternalImport(id: string | null | undefined, params: Params = {}) {
+  return useQuery({
+    queryKey: ['external-import', id, params],
+    queryFn: () => api.get<ExternalImport>(`/external-imports/${id}`, params),
+    enabled: !!id,
+    placeholderData: keepPreviousData,
   })
 }
 

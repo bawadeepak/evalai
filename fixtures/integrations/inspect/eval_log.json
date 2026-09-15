@@ -1,0 +1,44 @@
+{
+  "version": 2,
+  "status": "success",
+  "eval": {
+    "run_id": "synthetic-run-7Qm2",
+    "eval_id": "synthetic-eval-K4pX",
+    "task": "capital_cities",
+    "task_id": "synthetic-task-001",
+    "task_version": 0,
+    "created": "2026-09-16T08:00:00+00:00",
+    "model": "mockllm/model",
+    "dataset": {"name": "capitals-synthetic", "samples": 4},
+    "packages": {"inspect_ai": "0.3.0-synthetic"},
+    "metadata": {"note": "Synthetic fixture shaped like an Inspect EvalLog JSON. The mockllm provider returns canned text; nothing here is a model measurement."}
+  },
+  "results": {
+    "total_samples": 4,
+    "completed_samples": 4,
+    "scores": [
+      {"name": "match", "scorer": "match", "metrics": {"accuracy": {"name": "accuracy", "value": 0.5}}},
+      {"name": "length", "scorer": "length_ratio", "metrics": {"mean": {"name": "mean", "value": 0.9}}}
+    ]
+  },
+  "stats": {"started_at": "2026-09-16T08:00:00+00:00", "completed_at": "2026-09-16T08:00:02+00:00"},
+  "samples": [
+    {"id": "cap-fr", "epoch": 1, "input": "What is the capital of France?", "target": "Paris",
+     "output": {"model": "mockllm/model", "choices": [{"message": {"role": "assistant", "content": "Paris"}, "stop_reason": "stop"}], "completion": "Paris"},
+     "scores": {"match": {"value": "C", "answer": "Paris", "explanation": "exact match"}, "length": {"value": 1.0}},
+     "metadata": {"external_id": "CAP-FR"}},
+    {"id": "cap-au", "epoch": 1, "input": "What is the capital of Australia?", "target": "Canberra",
+     "output": {"model": "mockllm/model", "choices": [{"message": {"role": "assistant", "content": "Sydney"}, "stop_reason": "stop"}], "completion": "Sydney"},
+     "scores": {"match": {"value": "I", "answer": "Sydney", "explanation": "expected Canberra"}, "length": {"value": 0.75}},
+     "metadata": {"external_id": "CAP-AU"}},
+    {"id": "cap-ca", "epoch": 1, "input": [{"role": "user", "content": "Capital of Canada?"}], "target": ["Ottawa"],
+     "output": {"model": "mockllm/model", "choices": [{"message": {"role": "assistant", "content": "Ottawa, Ontario"}, "stop_reason": "stop"}], "completion": "Ottawa, Ontario"},
+     "scores": {"match": {"value": "P", "answer": "Ottawa, Ontario", "explanation": "partial credit"}},
+     "metadata": {}},
+    {"id": "cap-nz", "epoch": 1, "input": "What is the capital of New Zealand?", "target": "Wellington",
+     "output": {"model": "mockllm/model", "choices": []},
+     "scores": {},
+     "error": {"message": "Synthetic model error: rate limited", "traceback": ""},
+     "metadata": {"external_id": "CAP-NZ"}}
+  ]
+}

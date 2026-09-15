@@ -548,6 +548,50 @@ class MemoryStoreOwnership(Base):
     dropped_at: Mapped[datetime | None] = mapped_column(UTCDateTime, nullable=True)
 
 
+class ExternalImport(Base):
+    """A result file imported from an external tool (Inspect log, Promptfoo results).
+
+    Keeps the upstream identity and the original file as an artifact. Immutable.
+    """
+
+    __tablename__ = "external_imports"
+    __table_args__ = (Index("ix_external_import_project", "project_id", "created_at"),)
+    id: Mapped[str] = _id()
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"), nullable=False)
+    plugin: Mapped[str] = mapped_column(String(40), nullable=False)
+    plugin_version: Mapped[str] = mapped_column(String(40), nullable=False)
+    source_version: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    source_identity: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    artifact_hash: Mapped[str] = mapped_column(ForeignKey("artifacts.content_hash"), nullable=False)
+    filename: Mapped[str | None] = mapped_column(String(300), nullable=True)
+    summary: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    warnings: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    is_demo: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    created_at: Mapped[datetime] = _created()
+
+
+class ExternalResult(Base):
+    """One normalized upstream result: assertions and scores exactly as the tool reported them."""
+
+    __tablename__ = "external_results"
+    __table_args__ = (UniqueConstraint("import_id", "ordinal", name="uq_external_result_ordinal"),)
+    id: Mapped[str] = _id()
+    import_id: Mapped[str] = mapped_column(ForeignKey("external_imports.id"), nullable=False)
+    ordinal: Mapped[int] = mapped_column(Integer, nullable=False)
+    upstream_id: Mapped[str] = mapped_column(String(200), nullable=False)
+    case_external_id: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    epoch: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    provider: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    input: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    expected: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    output: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    status: Mapped[str] = mapped_column(String(20), nullable=False)
+    assertions: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    scores: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    error: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    extra: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+
+
 #: Tables whose rows may never be updated or deleted.
 IMMUTABLE_TABLES = (
     "scenario_versions",
@@ -565,4 +609,6 @@ IMMUTABLE_TABLES = (
     "artifacts",
     "artifact_refs",
     "events",
+    "external_imports",
+    "external_results",
 )

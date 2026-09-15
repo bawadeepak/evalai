@@ -52,8 +52,12 @@ TABLES: list[tuple[str, type]] = [
     ("grading_runs", m.GradingRun), ("trials", m.Trial), ("attempts", m.Attempt), ("grades", m.Grade),
     ("trial_outcomes", m.TrialOutcome), ("reviews", m.Review), ("comparisons", m.Comparison),
     ("calibration_versions", m.CalibrationVersion), ("probability_records", m.ProbabilityRecord),
+    ("external_imports", m.ExternalImport), ("external_results", m.ExternalResult),
     ("artifact_refs", m.ArtifactRef),
 ]
+#: Imported result files are excluded from text-redacted exports (their original
+#: file is an artifact, and redacted exports carry no artifacts).
+EXTERNAL_TABLES = ("external_imports", "external_results")
 ID_COLUMNS: dict[str, dict[str, str]] = {
     "target_config_versions": {"parent_id": "target_config_versions"},
     "grader_versions": {"judge_config_id": "target_config_versions", "parent_id": "grader_versions"},
@@ -71,12 +75,14 @@ ID_COLUMNS: dict[str, dict[str, str]] = {
     "comparisons": {"baseline_run_id": "runs", "candidate_run_id": "runs", "policy_id": "release_policies"},
     "calibration_versions": {},
     "probability_records": {"dataset_id": "dataset_versions", "case_id": "cases", "trial_id": "trials"},
+    "external_imports": {},
+    "external_results": {"import_id": "external_imports"},
     "artifact_refs": {},
 }
 LIST_COLUMNS = {("scenario_versions", "grader_refs"): "grader_versions",
                 ("grading_runs", "grader_ids"): "grader_versions", ("reviews", "grade_ids"): "grades",
                 ("comparisons", "grading_run_ids"): "grading_runs"}
-ENTITY_TABLES = {"attempt": "attempts", "trial": "trials"}
+ENTITY_TABLES = {"attempt": "attempts", "trial": "trials", "external_import": "external_imports"}
 
 
 class ArchiveError(ValueError):
@@ -103,6 +109,7 @@ def _project_rows(session, project_id: str) -> dict[str, list]:
         if run_ids else []
     attempt_ids = list(session.scalars(select(m.Attempt.id).where(m.Attempt.trial_id.in_(trial_ids)))) \
         if trial_ids else []
+    import_ids = list(session.scalars(select(m.ExternalImport.id).where(m.ExternalImport.project_id == project_id)))
 
     def rows(model, *where):
         return list(session.scalars(select(model).where(*where))) if all(w is not None for w in where) else []
@@ -122,7 +129,9 @@ def _project_rows(session, project_id: str) -> dict[str, list]:
         "reviews": rows(m.Review, m.Review.trial_id.in_(trial_ids)),
         "comparisons": by_project(m.Comparison), "calibration_versions": by_project(m.CalibrationVersion),
         "probability_records": by_project(m.ProbabilityRecord),
-        "artifact_refs": rows(m.ArtifactRef, m.ArtifactRef.entity_id.in_(trial_ids + attempt_ids)),
+        "external_imports": by_project(m.ExternalImport),
+        "external_results": rows(m.ExternalResult, m.ExternalResult.import_id.in_(import_ids)),
+        "artifact_refs": rows(m.ArtifactRef, m.ArtifactRef.entity_id.in_(trial_ids + attempt_ids + import_ids)),
     }
 
 
@@ -143,6 +152,10 @@ def build_export(session, store: ArtifactStore, project_id: str, *, redact_text:
     if project is None:
         raise KeyError(project_id)
     tables = _project_rows(session, project_id)
+    if redact_text:
+        for table in EXTERNAL_TABLES:
+            tables[table] = []
+        tables["artifact_refs"] = [r for r in tables["artifact_refs"] if r.entity_type != "external_import"]
     members: dict[str, bytes] = {}
     counts = {}
     for table, rows in tables.items():
@@ -167,7 +180,8 @@ def build_export(session, store: ArtifactStore, project_id: str, *, redact_text:
                    "is_demo": project.is_demo},
         "counts": counts, "artifacts": 0 if redact_text else len(artifact_hashes),
         "redaction": ({"text_excluded": True, "note": "Case inputs/expectations, outputs, traces, judge text, "
-                                                      "review text and artifact files were excluded."}
+                                                      "review text, artifact files and imported external result "
+                                                      "files were excluded."}
                       if redact_text else {"text_excluded": False}),
         "credentials": "Only credential reference names are exported; no secret values exist in the store.",
         "checksums": {name: hashlib.sha256(data).hexdigest() for name, data in sorted(members.items())},

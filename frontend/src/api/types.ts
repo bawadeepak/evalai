@@ -806,3 +806,73 @@ export type ImportRecord = {
 }
 
 export type RunEvent = { id: number; type: string; timestamp: string; run_id: string; entity_id: string | null; payload: Record<string, unknown> }
+
+export type ExternalAssertion = {
+  type: string
+  status: 'pass' | 'fail' | 'error' | 'skipped'
+  reason: string
+  value: unknown
+  score: number | null
+  provenance: Record<string, unknown>
+}
+
+export type ExternalScore = {
+  name: string
+  value: number | string | boolean | null
+  kind: 'numeric' | 'binary' | 'label' | 'text'
+  definition: string
+  implementation_version: string
+  judge: Record<string, unknown> | null
+  is_probability: false
+  note: string
+}
+
+export type ExternalResult = {
+  id: string
+  ordinal: number
+  upstream_id: string
+  case_external_id: string | null
+  epoch: number | null
+  provider: string | null
+  input: Record<string, unknown>
+  expected: Record<string, unknown> | null
+  output: Record<string, unknown> | null
+  status: 'pass' | 'fail' | 'error' | 'unscored'
+  assertions: ExternalAssertion[]
+  scores: ExternalScore[]
+  error: Record<string, unknown> | null
+  extra: Record<string, unknown>
+}
+
+export type ExternalImport = {
+  id: string
+  project_id: string
+  plugin: string
+  plugin_version: string
+  source_version: string | null
+  source_identity: Record<string, unknown>
+  artifact_hash: string
+  filename: string | null
+  summary: Record<string, unknown>
+  warnings: string[]
+  is_demo: boolean
+  created_at: string
+  result_count: number | null
+  results?: ExternalResult[]
+}
+
+export type PluginCapability = { available: boolean; reason?: string | null; version?: string | null; [key: string]: unknown }
+
+export type IntegrationPlugin = {
+  id: string
+  version: string
+  title: string
+  purpose: string
+  supported_packs: string[]
+  input: string
+  input_schema: Record<string, unknown>
+  result_schema: Record<string, unknown>
+  operations: string[]
+  install: string
+  capabilities: Record<string, PluginCapability>
+}

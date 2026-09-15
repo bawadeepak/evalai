@@ -6,6 +6,7 @@ import { ToastProvider } from '../components/Toast'
 import { ComparePage } from '../pages/ComparePage'
 import { DatasetDetailPage } from '../pages/DatasetDetailPage'
 import { DatasetsPage } from '../pages/DatasetsPage'
+import { ExternalImportPage } from '../pages/ExternalImportPage'
 import { NotFoundPage } from '../pages/NotFoundPage'
 import { OverviewPage } from '../pages/OverviewPage'
 import { ProbabilityPage } from '../pages/ProbabilityPage'
@@ -65,6 +66,7 @@ export function AppRoutes() {
         <Route path="compare" element={<ComparePage />} />
         <Route path="providers" element={<ProvidersPage />} />
         <Route path="settings" element={<SettingsPage />} />
+        <Route path="external/:id" element={<ExternalImportPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

@@ -148,7 +148,10 @@ async def run_import(app: AppContext, job, worker_id: str) -> dict[str, Any]:
 
 
 def register_background_handlers(register) -> None:
+    from eval_triage.integrations.jobs import register_integration_handlers
+
     register(JobKind.CONNECTION_TEST, run_connection_test)
     register(JobKind.CALIBRATION_FIT, run_calibration_fit)
     register(JobKind.EXPORT, run_export)
     register(JobKind.IMPORT, run_import)
+    register_integration_handlers(register)

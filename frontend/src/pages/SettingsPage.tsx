@@ -12,6 +12,7 @@ import { Content, Field, PageHeader, Section } from '../components/Page'
 import { QueryState } from '../components/States'
 import { Badge, StatusBadge } from '../components/Status'
 import { useToast } from '../components/Toast'
+import { ExternalResults } from '../features/integrations/ExternalResults'
 
 function ReviewerSetting() {
   const [name, setName] = useState(getReviewer)
@@ -318,6 +319,7 @@ export function SettingsPage() {
           )}
         </QueryState>
         <ExportImport />
+        <ExternalResults />
         <Section title="Health diagnostics" id="diagnostics">
           <QueryState query={health}>{(h) => <Json value={h} label="Health response" />}</QueryState>
         </Section>

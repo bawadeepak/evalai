@@ -5,6 +5,7 @@ from eval_triage.api.routes import (
     definitions,
     exchange,
     health,
+    integrations,
     probability,
     projects,
     reviews,
@@ -13,5 +14,6 @@ from eval_triage.api.routes import (
 )
 
 api_router = APIRouter()
-for module in (health, projects, definitions, runs, analysis, reviews, probability, exchange, settings):
+for module in (health, projects, definitions, runs, analysis, reviews, probability, exchange, settings,
+               integrations):
     api_router.include_router(module.router)

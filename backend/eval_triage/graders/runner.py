@@ -42,6 +42,10 @@ def grade(ctx: GradingContext, judge: JudgeCall | None = None) -> GradeResult:
         if kind is GraderKind.PAIRWISE:
             return grade_pairwise(ctx, judge)
         plugin = (ctx.grader.get("config") or {}).get("plugin")
+        if plugin == "ragas":
+            from eval_triage.integrations import ragas_grader
+
+            return ragas_grader.grade(ctx)
         return GradeResult(Verdict.UNAVAILABLE, reason=f"external plugin {plugin!r} is not installed or configured")
     except Exception as exc:  # noqa: BLE001 - a grader bug must surface as a grading error, never a verdict
         return GradeResult(Verdict.ERROR, reason="grader_exception",

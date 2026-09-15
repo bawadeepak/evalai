@@ -85,6 +85,7 @@ class JobKind(StrEnum):
     EXPORT = "export"
     IMPORT = "import"
     PROMPTFOO = "promptfoo"
+    INSPECT_RUN = "inspect_run"
 
 
 class Pack(StrEnum):
