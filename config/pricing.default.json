@@ -1,0 +1,8 @@
+{
+  "as_of": "2026-09-15",
+  "description": "Shipped defaults price only the offline demo adapter. Add real provider prices, with their own as_of date, in $EVAL_TRIAGE_DATA_DIR/pricing.json. Models without an entry show cost 'unknown'.",
+  "entries": [
+    {"adapter": "demo", "model": "*", "currency": "USD", "input_per_million": 0.0, "output_per_million": 0.0,
+     "note": "Demo adapter makes no provider calls and costs nothing."}
+  ]
+}

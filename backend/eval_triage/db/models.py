@@ -126,6 +126,7 @@ class Case(Base):
     cluster_id: Mapped[str] = mapped_column(String(200), nullable=False)
     weight: Mapped[float] = mapped_column(Float, nullable=False, default=1.0)
     split: Mapped[str] = mapped_column(String(40), nullable=False, default="test")
+    fixture_options: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
     case_hash: Mapped[str] = mapped_column(String(64), nullable=False)
 
 
@@ -351,6 +352,22 @@ class Grade(Base):
     explanation: Mapped[str] = mapped_column(Text, nullable=False, default="")
     error: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     judge_attempts: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = _created()
+
+
+class TrialOutcome(Base):
+    """Result of applying the dataset pass rule to one trial within one grading run."""
+
+    __tablename__ = "trial_outcomes"
+    __table_args__ = (UniqueConstraint("grading_run_id", "trial_id"),
+                      Index("ix_trial_outcome_trial", "trial_id"))
+    id: Mapped[str] = _id()
+    grading_run_id: Mapped[str] = mapped_column(ForeignKey("grading_runs.id"), nullable=False)
+    trial_id: Mapped[str] = mapped_column(ForeignKey("trials.id"), nullable=False)
+    outcome: Mapped[str] = mapped_column(String(20), nullable=False)
+    reason: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    invariant_failures: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     created_at: Mapped[datetime] = _created()
 
 
@@ -542,6 +559,7 @@ IMMUTABLE_TABLES = (
     "calibration_versions",
     "probability_records",
     "grades",
+    "trial_outcomes",
     "reviews",
     "comparisons",
     "artifacts",

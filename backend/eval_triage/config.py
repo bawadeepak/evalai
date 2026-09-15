@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     lease_seconds: float = 60.0
     heartbeat_seconds: float = 10.0
     worker_poll_seconds: float = 0.5
+    worker_slots: int = 4
 
     # Serve the built frontend from the API process when present.
     frontend_dist: Path = REPO_ROOT / "frontend" / "dist"
