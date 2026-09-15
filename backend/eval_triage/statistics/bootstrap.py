@@ -144,7 +144,9 @@ def evaluate_gate(policy: ReleasePolicyConfig, metric_results: Mapping[str, Mapp
         entry = {"check": f"metric:{metric.name}", "direction": metric.direction, "margin": metric.margin,
                  "required": metric.required}
         if result is None or result.get("lower") is None or result.get("upper") is None:
-            entry.update(status="inconclusive", reason="no interval available")
+            why = (result or {}).get("reason") or "no paired cases with binary grades"
+            entry.update(status="inconclusive", reason=f"no interval available ({why}; "
+                                                       f"{(result or {}).get('clusters', 0)} independent clusters)")
         elif result.get("clusters", 0) < policy.min_independent_clusters:
             entry.update(status="inconclusive", reason=f"{result.get('clusters', 0)} independent clusters; "
                                                        f"{policy.min_independent_clusters} required")
