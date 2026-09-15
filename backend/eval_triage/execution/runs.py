@@ -39,7 +39,7 @@ from eval_triage.execution.manifest import build_manifest, manifest_hash
 
 #: Parameters the adapters interpret themselves (not provider sampling parameters).
 ADAPTER_PARAMETERS = {"profile", "delay_ms", "max_tokens", "max_output_tokens", "system", "stop", "reasoning",
-                      "max_turns"}
+                      "max_turns", "effort", "max_completion_tokens"}
 DEFAULT_CONCURRENCY = {"memoryai": 1}
 STATELESS_DEFAULT_CONCURRENCY = 2
 
