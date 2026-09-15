@@ -39,9 +39,14 @@ export { expect }
 export async function selectDemoProject(page: Page) {
   await page.goto('/')
   const select = page.getByLabel('Project', { exact: true })
+  await expect(select.locator('option').first()).toBeAttached()
+  // Below 768 px the selector lives in the collapsed navigation.
+  const collapsed = !(await select.isVisible())
+  if (collapsed) await page.getByRole('button', { name: 'Open navigation' }).click()
   const options = await select.locator('option').allTextContents()
   const demo = options.find((o) => o.includes('(demo)'))
   if (demo) await select.selectOption({ label: demo })
+  if (collapsed) await page.getByRole('button', { name: 'Close navigation' }).click()
 }
 
 export async function setReviewer(page: Page, name = 'E2E Reviewer') {

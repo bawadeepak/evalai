@@ -1,10 +1,11 @@
 // Global shell: navigation, project selector, health footer, demo banner and
 // the service-unreachable notice. Collapses to a menu below 768px.
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useHealth } from '../api/hooks'
 import { ApiError } from '../api/client'
+import { Loading } from '../components/States'
 import { useProject } from './project'
 import { useTheme, type ThemeChoice } from './theme'
 
@@ -100,25 +101,50 @@ export function Shell() {
   const { project } = useProject()
   const health = useHealth()
   const disconnected = health.isError && health.error instanceof ApiError && health.error.disconnected
+  const openButton = useRef<HTMLButtonElement>(null)
+  const closeButton = useRef<HTMLButtonElement>(null)
+  const wasOpen = useRef(false)
   useEffect(() => setNavOpen(false), [location.pathname])
+  // On narrow screens the navigation is an overlay: focus moves into it when it
+  // opens and back to the menu button when it closes; Escape closes it.
+  useEffect(() => {
+    if (navOpen) {
+      closeButton.current?.focus()
+      const onKey = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') setNavOpen(false)
+      }
+      window.addEventListener('keydown', onKey)
+      wasOpen.current = true
+      return () => window.removeEventListener('keydown', onKey)
+    }
+    if (wasOpen.current) {
+      wasOpen.current = false
+      openButton.current?.focus()
+    }
+    return undefined
+  }, [navOpen])
 
   return (
     <div className={`shell${navOpen ? ' nav-open' : ''}`}>
       <a className="skip-link" href="#main">
         Skip to content
       </a>
+      {navOpen && <div className="nav-backdrop" aria-hidden="true" onClick={() => setNavOpen(false)} />}
       <nav className="nav" aria-label="Primary">
         <div className="brand">
           <span className="brand-mark" aria-hidden="true">
             ⌖
           </span>
           Eval Triage
+          <button ref={closeButton} type="button" className="btn btn-sm nav-close" aria-label="Close navigation" onClick={() => setNavOpen(false)}>
+            ×
+          </button>
         </div>
         <ProjectSelector />
         <ul className="nav-links">
           {LINKS.map(([to, label, icon]) => (
             <li key={to}>
-              <NavLink to={to} end={to === '/'}>
+              <NavLink to={to} end={to === '/'} onClick={() => setNavOpen(false)}>
                 <span className="nav-icon" aria-hidden="true">
                   {icon}
                 </span>
@@ -135,11 +161,12 @@ export function Shell() {
       <div className="main">
         <div className="topbar">
           <button
+            ref={openButton}
             type="button"
             className="btn btn-sm"
             aria-expanded={navOpen}
-            aria-label={navOpen ? 'Close navigation' : 'Open navigation'}
-            onClick={() => setNavOpen((open) => !open)}
+            aria-label="Open navigation"
+            onClick={() => setNavOpen(true)}
           >
             ☰ Menu
           </button>
@@ -158,7 +185,15 @@ export function Shell() {
           </div>
         )}
         <main id="main" tabIndex={-1} style={{ outline: 'none' }}>
-          <Outlet />
+          <Suspense
+            fallback={
+              <div className="content">
+                <Loading label="Loading page" />
+              </div>
+            }
+          >
+            <Outlet />
+          </Suspense>
         </main>
       </div>
     </div>

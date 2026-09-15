@@ -102,27 +102,39 @@ class Worker:
                     return
 
         beat = asyncio.create_task(heartbeat())
+
+        async def stop_beat() -> None:
+            # Renewals stop before the job leaves RUNNING, so "lost lease" only ever
+            # means another worker (or recovery) really took the job.
+            beat.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                await beat
+
         try:
             handler = HANDLERS.get(job.kind)
             if handler is None:
+                await stop_beat()
                 await asyncio.to_thread(jobs.fail, self.ctx.db, job.id, self.worker_id,
                                         {"code": "no_handler", "message": f"no handler for {job.kind}"})
                 return
             result = await handler(self.ctx, job, self.worker_id)
-            await asyncio.to_thread(jobs.complete, self.ctx.db, job.id, self.worker_id, result)
+            await stop_beat()
+            if not await asyncio.to_thread(jobs.complete, self.ctx.db, job.id, self.worker_id, result):
+                log.warning("job %s finished after its lease was lost; the result was not recorded", job.id)
+                return
             # A job counts as open until it is completed, so completion is re-checked afterwards.
             await asyncio.to_thread(self._after_job, job)
         except Defer as deferral:
+            await stop_beat()
             await asyncio.to_thread(jobs.defer, self.ctx.db, job.id, self.worker_id, deferral.seconds, deferral.note)
         except Exception as exc:  # noqa: BLE001 - job failures are recorded, never crash the worker
             log.exception("job %s failed", job.id)
+            await stop_beat()
             await asyncio.to_thread(jobs.fail, self.ctx.db, job.id, self.worker_id,
                                     {"code": "job_exception", "message": f"{type(exc).__name__}: {exc}"[:1000],
                                      "traceback": traceback.format_exc(limit=8)}, 2.0)
         finally:
-            beat.cancel()
-            with contextlib.suppress(asyncio.CancelledError):
-                await beat
+            await stop_beat()
 
     async def run(self, once: bool = False, max_seconds: float | None = None) -> int:
         loop = asyncio.get_running_loop()

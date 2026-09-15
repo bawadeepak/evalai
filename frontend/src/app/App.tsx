@@ -1,26 +1,31 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { useState, type ReactNode } from 'react'
+import { lazy, useState, type ReactNode } from 'react'
 import { Route, Routes } from 'react-router-dom'
 import { ApiError } from '../api/client'
 import { ToastProvider } from '../components/Toast'
-import { ComparePage } from '../pages/ComparePage'
-import { DatasetDetailPage } from '../pages/DatasetDetailPage'
-import { DatasetsPage } from '../pages/DatasetsPage'
-import { ExternalImportPage } from '../pages/ExternalImportPage'
-import { NotFoundPage } from '../pages/NotFoundPage'
-import { OverviewPage } from '../pages/OverviewPage'
-import { ProbabilityPage } from '../pages/ProbabilityPage'
-import { ProvidersPage } from '../pages/ProvidersPage'
-import { RunResultsPage } from '../pages/RunResultsPage'
-import { RunSetupPage } from '../pages/RunSetupPage'
-import { RunsPage } from '../pages/RunsPage'
-import { ScenarioDetailPage } from '../pages/ScenarioDetailPage'
-import { ScenariosPage } from '../pages/ScenariosPage'
-import { ScenarioWizardPage } from '../pages/ScenarioWizardPage'
-import { SettingsPage } from '../pages/SettingsPage'
-import { TriagePage } from '../pages/TriagePage'
 import { ProjectProvider } from './project'
 import { Shell } from './Shell'
+
+// Pages load on demand so the first screen does not pay for every chart and editor.
+const page = <K extends string>(load: () => Promise<Record<K, React.ComponentType>>, name: K) =>
+  lazy(() => load().then((module) => ({ default: module[name] })))
+
+const OverviewPage = page(() => import('../pages/OverviewPage'), 'OverviewPage')
+const ScenariosPage = page(() => import('../pages/ScenariosPage'), 'ScenariosPage')
+const ScenarioWizardPage = page(() => import('../pages/ScenarioWizardPage'), 'ScenarioWizardPage')
+const ScenarioDetailPage = page(() => import('../pages/ScenarioDetailPage'), 'ScenarioDetailPage')
+const DatasetsPage = page(() => import('../pages/DatasetsPage'), 'DatasetsPage')
+const DatasetDetailPage = page(() => import('../pages/DatasetDetailPage'), 'DatasetDetailPage')
+const RunsPage = page(() => import('../pages/RunsPage'), 'RunsPage')
+const RunSetupPage = page(() => import('../pages/RunSetupPage'), 'RunSetupPage')
+const RunResultsPage = page(() => import('../pages/RunResultsPage'), 'RunResultsPage')
+const TriagePage = page(() => import('../pages/TriagePage'), 'TriagePage')
+const ProbabilityPage = page(() => import('../pages/ProbabilityPage'), 'ProbabilityPage')
+const ComparePage = page(() => import('../pages/ComparePage'), 'ComparePage')
+const ProvidersPage = page(() => import('../pages/ProvidersPage'), 'ProvidersPage')
+const SettingsPage = page(() => import('../pages/SettingsPage'), 'SettingsPage')
+const ExternalImportPage = page(() => import('../pages/ExternalImportPage'), 'ExternalImportPage')
+const NotFoundPage = page(() => import('../pages/NotFoundPage'), 'NotFoundPage')
 
 export function makeQueryClient(): QueryClient {
   return new QueryClient({

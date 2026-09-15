@@ -5,5 +5,13 @@
 .slider-thumb { display: block; width: 20px; height: 20px; border-radius: 50%; background: var(--surface); border: 2px solid var(--accent); box-shadow: var(--shadow); cursor: grab; }
 .slider-thumb:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
+/* Narrow-screen navigation overlay: in-panel close button and a dismissing backdrop. */
+.nav-close { display: none; margin-left: auto; }
+.nav-backdrop { display: none; }
+@media (max-width: 767px) {
+  .nav-close { display: inline-flex; }
+  .shell.nav-open .nav-backdrop { display: block; position: fixed; inset: 0; background: rgb(0 0 0 / 35%); z-index: 140; }
+}
+
 details > summary { cursor: pointer; }
 ins { text-decoration: none; }
