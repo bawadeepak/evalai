@@ -1,0 +1,22 @@
+external_id: M11
+purpose: >-
+  With the small-talk classifier forced to time out (test-only fault injection
+  recorded in the manifest), MemoryAI fails open. The outcome must be recorded as
+  a fallback, not as a successful classification.
+severity: medium
+cluster_id: synthetic-person-11
+split: test
+tags: {language: en, temporal_update: false, negation: false, lifecycle: fault_injection}
+fixture_options:
+  fault_injection: {smalltalk: timeout}
+episode:
+  - {id: e1, action: remember, args: {text: "Thanks! I started a new job at the hospital."}}
+  - {id: s1, action: inspect_state}
+expected:
+  classification_outcome: {step: e1, outcome: fallback}
+  required_facts:
+    - subject: user
+      relation: employer
+      object: hospital
+      source_step: e1
+  evidence_steps: [e1, s1]

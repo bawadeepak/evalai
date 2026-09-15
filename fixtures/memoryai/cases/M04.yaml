@@ -1,0 +1,25 @@
+external_id: M04
+purpose: >-
+  A durable fact written only in non-Latin script must not be dropped. Motivated by
+  the inspected small-talk rule (Latin-only word regex with all([]) on no tokens);
+  a full live failure has not been established.
+severity: high
+cluster_id: synthetic-person-04
+split: test
+tags: {language: zh, temporal_update: false, negation: false, lifecycle: small_talk}
+episode:
+  - {id: e1, action: remember, args: {text: "我住在悉尼。"}}
+  - {id: s1, action: inspect_state}
+  - {id: r1, action: recall, args: {query: "我住在哪里？", level: mid, budget: 400}}
+  - {id: a1, action: generate, args: {question: "我住在哪里？", context_ref: r1.context}}
+expected:
+  required_facts:
+    - subject: user
+      relation: current_home
+      object: 悉尼
+      source_step: e1
+      match: {any: ["悉尼", "sydney"]}
+  answer_contains_any: ["悉尼", "Sydney"]
+  evidence_steps: [e1, r1]
+evidence:
+  - {step: e1, role: current_fact_source}

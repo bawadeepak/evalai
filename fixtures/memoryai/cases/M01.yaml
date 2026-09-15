@@ -1,0 +1,18 @@
+external_id: M01
+purpose: Remember a stated residence and recall it; the fact's source points to the input turn.
+severity: high
+cluster_id: synthetic-person-01
+split: test
+tags: {language: en, temporal_update: false, negation: false, lifecycle: remember}
+episode:
+  - {id: e1, action: remember, args: {text: "I live in Sydney."}}
+  - {id: s1, action: inspect_state}
+  - {id: r1, action: recall, args: {query: "Where do I live?", level: mid, budget: 400}}
+  - {id: a1, action: generate, args: {question: "Where do I live?", context_ref: r1.context}}
+expected:
+  required_facts:
+    - {subject: user, relation: current_home, object: Sydney, source_step: e1}
+  answer_contains: [Sydney]
+  evidence_steps: [e1, r1]
+evidence:
+  - {step: e1, role: current_fact_source}

@@ -1,0 +1,18 @@
+schema_version: 1
+description: >-
+  Fixed illustrative outputs for the labelled demo routing suite. Not model
+  measurements. Each profile answers with the case's expected label unless a
+  case entry below overrides it. Repeat keys are zero-based indices written as
+  strings (JSON object keys are always strings).
+kind: classification
+repeats: 5
+profiles:
+  baseline:
+    R07: {default: {label: technical}}                          # stable wrong
+    R11: {repeats: {"1": {label: account}, "3": {label: account}}}   # flaky
+    R23: {default: {label: account}}                            # allowed alternative: passes
+  candidate:
+    R11: {repeats: {"2": {label: billing}}}                     # still flaky, less often
+    R15: {repeats: {"2": {malformed: '{"label": "billing"'}}}   # invalid JSON output
+    R19: {default: {label: other}}                              # new stable regression
+    R20: {repeats: {"4": {provider_error: {code: rate_limited, message: "HTTP 429 from demo provider", retryable: false}}}}

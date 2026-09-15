@@ -1,0 +1,46 @@
+schema_version: 1
+name: refund-need-probability
+pack: probability_calibration
+contract: >-
+  For each customer message, report the probability (0 to 1) that the message
+  describes a problem requiring a refund. Reply with JSON {"probability": p}.
+description: >-
+  Binary event with labels known in advance. Predictions are recorded before
+  labels are joined. Calibration fitting uses the calibration split only.
+slice_keys: [channel]
+event_definition: the customer message describes a problem that requires a refund
+graders:
+  - name: probability
+    kind: deterministic
+    checks: [probability_record]
+dataset:
+  name: refund-need-probability-smoke
+  cases:
+    - external_id: K01
+      purpose: Clear positive.
+      cluster_id: refund-conv-01
+      split: calibration
+      tags: {channel: email}
+      input: {question: "My parcel arrived crushed and the vase inside is broken."}
+      expected: {label: 1}
+    - external_id: K02
+      purpose: Clear negative.
+      cluster_id: refund-conv-02
+      split: calibration
+      tags: {channel: chat}
+      input: {question: "Can you tell me your opening hours?"}
+      expected: {label: 0}
+    - external_id: K03
+      purpose: Positive requiring inference.
+      cluster_id: refund-conv-03
+      split: test
+      tags: {channel: email}
+      input: {question: "I was billed for a plan I cancelled last month."}
+      expected: {label: 1}
+    - external_id: K04
+      purpose: "Boundary: positive sentiment, no refund needed."
+      cluster_id: refund-conv-04
+      split: test
+      tags: {channel: chat}
+      input: {question: "Great service, thanks, the replacement arrived quickly!"}
+      expected: {label: 0}

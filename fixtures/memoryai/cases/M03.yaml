@@ -1,0 +1,20 @@
+external_id: M03
+purpose: >-
+  A durable change survives the small-talk filter even though the message opens
+  with an acknowledgement.
+severity: high
+cluster_id: synthetic-person-03
+split: test
+tags: {language: en, temporal_update: true, negation: false, lifecycle: small_talk}
+episode:
+  - {id: e1, action: remember, args: {text: "Thanks! I moved to Perth last week."}}
+  - {id: s1, action: inspect_state}
+  - {id: r1, action: recall, args: {query: "Where do I live now?", level: mid, budget: 400}}
+  - {id: a1, action: generate, args: {question: "Where do I live now?", context_ref: r1.context}}
+expected:
+  required_facts:
+    - {subject: user, relation: current_home, object: Perth, source_step: e1}
+  answer_contains: [Perth]
+  evidence_steps: [e1, r1]
+evidence:
+  - {step: e1, role: current_fact_source}

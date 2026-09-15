@@ -1,0 +1,646 @@
+{
+ "schema_version": 1,
+ "demo": true,
+ "records": [
+  {
+   "external_id": "P00-0",
+   "cluster_id": "prob-conversation-00",
+   "split": "calibration",
+   "raw_feature": 0.651,
+   "probability": 0.651,
+   "label": 1
+  },
+  {
+   "external_id": "P00-1",
+   "cluster_id": "prob-conversation-00",
+   "split": "calibration",
+   "raw_feature": 0.309,
+   "probability": 0.309,
+   "label": 0
+  },
+  {
+   "external_id": "P01-0",
+   "cluster_id": "prob-conversation-01",
+   "split": "calibration",
+   "raw_feature": 0.742,
+   "probability": 0.742,
+   "label": 0
+  },
+  {
+   "external_id": "P01-1",
+   "cluster_id": "prob-conversation-01",
+   "split": "calibration",
+   "raw_feature": 0.889,
+   "probability": 0.889,
+   "label": 1
+  },
+  {
+   "external_id": "P02-0",
+   "cluster_id": "prob-conversation-02",
+   "split": "calibration",
+   "raw_feature": 0.447,
+   "probability": 0.447,
+   "label": 1
+  },
+  {
+   "external_id": "P02-1",
+   "cluster_id": "prob-conversation-02",
+   "split": "calibration",
+   "raw_feature": 0.256,
+   "probability": 0.256,
+   "label": 0
+  },
+  {
+   "external_id": "P03-0",
+   "cluster_id": "prob-conversation-03",
+   "split": "calibration",
+   "raw_feature": 0.075,
+   "probability": 0.075,
+   "label": 0
+  },
+  {
+   "external_id": "P03-1",
+   "cluster_id": "prob-conversation-03",
+   "split": "calibration",
+   "raw_feature": 0.661,
+   "probability": 0.661,
+   "label": 0
+  },
+  {
+   "external_id": "P04-0",
+   "cluster_id": "prob-conversation-04",
+   "split": "calibration",
+   "raw_feature": 0.257,
+   "probability": 0.257,
+   "label": 0
+  },
+  {
+   "external_id": "P04-1",
+   "cluster_id": "prob-conversation-04",
+   "split": "calibration",
+   "raw_feature": 0.811,
+   "probability": 0.811,
+   "label": 1
+  },
+  {
+   "external_id": "P05-0",
+   "cluster_id": "prob-conversation-05",
+   "split": "calibration",
+   "raw_feature": 0.807,
+   "probability": 0.807,
+   "label": 0
+  },
+  {
+   "external_id": "P05-1",
+   "cluster_id": "prob-conversation-05",
+   "split": "calibration",
+   "raw_feature": 0.37,
+   "probability": 0.37,
+   "label": 1
+  },
+  {
+   "external_id": "P06-0",
+   "cluster_id": "prob-conversation-06",
+   "split": "calibration",
+   "raw_feature": 0.95,
+   "probability": 0.95,
+   "label": 1
+  },
+  {
+   "external_id": "P06-1",
+   "cluster_id": "prob-conversation-06",
+   "split": "calibration",
+   "raw_feature": 0.137,
+   "probability": 0.137,
+   "label": 0
+  },
+  {
+   "external_id": "P07-0",
+   "cluster_id": "prob-conversation-07",
+   "split": "calibration",
+   "raw_feature": 0.847,
+   "probability": 0.847,
+   "label": 1
+  },
+  {
+   "external_id": "P07-1",
+   "cluster_id": "prob-conversation-07",
+   "split": "calibration",
+   "raw_feature": 0.809,
+   "probability": 0.809,
+   "label": 0
+  },
+  {
+   "external_id": "P08-0",
+   "cluster_id": "prob-conversation-08",
+   "split": "calibration",
+   "raw_feature": 0.554,
+   "probability": 0.554,
+   "label": 0
+  },
+  {
+   "external_id": "P08-1",
+   "cluster_id": "prob-conversation-08",
+   "split": "calibration",
+   "raw_feature": 0.406,
+   "probability": 0.406,
+   "label": 0
+  },
+  {
+   "external_id": "P09-0",
+   "cluster_id": "prob-conversation-09",
+   "split": "calibration",
+   "raw_feature": 0.83,
+   "probability": 0.83,
+   "label": 1
+  },
+  {
+   "external_id": "P09-1",
+   "cluster_id": "prob-conversation-09",
+   "split": "calibration",
+   "raw_feature": 0.86,
+   "probability": 0.86,
+   "label": 1
+  },
+  {
+   "external_id": "P10-0",
+   "cluster_id": "prob-conversation-10",
+   "split": "calibration",
+   "raw_feature": 0.712,
+   "probability": 0.712,
+   "label": 1
+  },
+  {
+   "external_id": "P10-1",
+   "cluster_id": "prob-conversation-10",
+   "split": "calibration",
+   "raw_feature": 0.264,
+   "probability": 0.264,
+   "label": 0
+  },
+  {
+   "external_id": "P11-0",
+   "cluster_id": "prob-conversation-11",
+   "split": "calibration",
+   "raw_feature": 0.125,
+   "probability": 0.125,
+   "label": 0
+  },
+  {
+   "external_id": "P11-1",
+   "cluster_id": "prob-conversation-11",
+   "split": "calibration",
+   "raw_feature": 0.145,
+   "probability": 0.145,
+   "label": 0
+  },
+  {
+   "external_id": "P12-0",
+   "cluster_id": "prob-conversation-12",
+   "split": "calibration",
+   "raw_feature": 0.648,
+   "probability": 0.648,
+   "label": 1
+  },
+  {
+   "external_id": "P12-1",
+   "cluster_id": "prob-conversation-12",
+   "split": "calibration",
+   "raw_feature": 0.398,
+   "probability": 0.398,
+   "label": 0
+  },
+  {
+   "external_id": "P13-0",
+   "cluster_id": "prob-conversation-13",
+   "split": "calibration",
+   "raw_feature": 0.301,
+   "probability": 0.301,
+   "label": 0
+  },
+  {
+   "external_id": "P13-1",
+   "cluster_id": "prob-conversation-13",
+   "split": "calibration",
+   "raw_feature": 0.659,
+   "probability": 0.659,
+   "label": 0
+  },
+  {
+   "external_id": "P14-0",
+   "cluster_id": "prob-conversation-14",
+   "split": "calibration",
+   "raw_feature": 0.211,
+   "probability": 0.211,
+   "label": 0
+  },
+  {
+   "external_id": "P14-1",
+   "cluster_id": "prob-conversation-14",
+   "split": "calibration",
+   "raw_feature": 0.204,
+   "probability": 0.204,
+   "label": 0
+  },
+  {
+   "external_id": "P15-0",
+   "cluster_id": "prob-conversation-15",
+   "split": "calibration",
+   "raw_feature": 0.98,
+   "probability": 0.98,
+   "label": 1
+  },
+  {
+   "external_id": "P15-1",
+   "cluster_id": "prob-conversation-15",
+   "split": "calibration",
+   "raw_feature": 0.574,
+   "probability": 0.574,
+   "label": 0
+  },
+  {
+   "external_id": "P16-0",
+   "cluster_id": "prob-conversation-16",
+   "split": "calibration",
+   "raw_feature": 0.842,
+   "probability": 0.842,
+   "label": 0
+  },
+  {
+   "external_id": "P16-1",
+   "cluster_id": "prob-conversation-16",
+   "split": "calibration",
+   "raw_feature": 0.265,
+   "probability": 0.265,
+   "label": 1
+  },
+  {
+   "external_id": "P17-0",
+   "cluster_id": "prob-conversation-17",
+   "split": "calibration",
+   "raw_feature": 0.347,
+   "probability": 0.347,
+   "label": 0
+  },
+  {
+   "external_id": "P17-1",
+   "cluster_id": "prob-conversation-17",
+   "split": "calibration",
+   "raw_feature": 0.248,
+   "probability": 0.248,
+   "label": 0
+  },
+  {
+   "external_id": "P18-0",
+   "cluster_id": "prob-conversation-18",
+   "split": "calibration",
+   "raw_feature": 0.874,
+   "probability": 0.874,
+   "label": 1
+  },
+  {
+   "external_id": "P18-1",
+   "cluster_id": "prob-conversation-18",
+   "split": "calibration",
+   "raw_feature": 0.666,
+   "probability": 0.666,
+   "label": 1
+  },
+  {
+   "external_id": "P19-0",
+   "cluster_id": "prob-conversation-19",
+   "split": "calibration",
+   "raw_feature": 0.91,
+   "probability": 0.91,
+   "label": 1
+  },
+  {
+   "external_id": "P19-1",
+   "cluster_id": "prob-conversation-19",
+   "split": "calibration",
+   "raw_feature": 0.299,
+   "probability": 0.299,
+   "label": 0
+  },
+  {
+   "external_id": "P20-0",
+   "cluster_id": "prob-conversation-20",
+   "split": "test",
+   "raw_feature": 0.578,
+   "probability": 0.578,
+   "label": 1
+  },
+  {
+   "external_id": "P20-1",
+   "cluster_id": "prob-conversation-20",
+   "split": "test",
+   "raw_feature": 0.6,
+   "probability": 0.6,
+   "label": 0
+  },
+  {
+   "external_id": "P21-0",
+   "cluster_id": "prob-conversation-21",
+   "split": "test",
+   "raw_feature": 0.425,
+   "probability": 0.425,
+   "label": 0
+  },
+  {
+   "external_id": "P21-1",
+   "cluster_id": "prob-conversation-21",
+   "split": "test",
+   "raw_feature": 0.988,
+   "probability": 0.988,
+   "label": 1
+  },
+  {
+   "external_id": "P22-0",
+   "cluster_id": "prob-conversation-22",
+   "split": "test",
+   "raw_feature": 0.135,
+   "probability": 0.135,
+   "label": 0
+  },
+  {
+   "external_id": "P22-1",
+   "cluster_id": "prob-conversation-22",
+   "split": "test",
+   "raw_feature": 0.153,
+   "probability": 0.153,
+   "label": 0
+  },
+  {
+   "external_id": "P23-0",
+   "cluster_id": "prob-conversation-23",
+   "split": "test",
+   "raw_feature": 0.795,
+   "probability": 0.795,
+   "label": 1
+  },
+  {
+   "external_id": "P23-1",
+   "cluster_id": "prob-conversation-23",
+   "split": "test",
+   "raw_feature": 0.11,
+   "probability": 0.11,
+   "label": 0
+  },
+  {
+   "external_id": "P24-0",
+   "cluster_id": "prob-conversation-24",
+   "split": "test",
+   "raw_feature": 0.986,
+   "probability": 0.986,
+   "label": 1
+  },
+  {
+   "external_id": "P24-1",
+   "cluster_id": "prob-conversation-24",
+   "split": "test",
+   "raw_feature": 0.963,
+   "probability": 0.963,
+   "label": 1
+  },
+  {
+   "external_id": "P25-0",
+   "cluster_id": "prob-conversation-25",
+   "split": "test",
+   "raw_feature": 0.061,
+   "probability": 0.061,
+   "label": 0
+  },
+  {
+   "external_id": "P25-1",
+   "cluster_id": "prob-conversation-25",
+   "split": "test",
+   "raw_feature": 0.691,
+   "probability": 0.691,
+   "label": 0
+  },
+  {
+   "external_id": "P26-0",
+   "cluster_id": "prob-conversation-26",
+   "split": "test",
+   "raw_feature": 0.301,
+   "probability": 0.301,
+   "label": 0
+  },
+  {
+   "external_id": "P26-1",
+   "cluster_id": "prob-conversation-26",
+   "split": "test",
+   "raw_feature": 0.155,
+   "probability": 0.155,
+   "label": 0
+  },
+  {
+   "external_id": "P27-0",
+   "cluster_id": "prob-conversation-27",
+   "split": "test",
+   "raw_feature": 0.477,
+   "probability": 0.477,
+   "label": 0
+  },
+  {
+   "external_id": "P27-1",
+   "cluster_id": "prob-conversation-27",
+   "split": "test",
+   "raw_feature": 0.873,
+   "probability": 0.873,
+   "label": 1
+  },
+  {
+   "external_id": "P28-0",
+   "cluster_id": "prob-conversation-28",
+   "split": "test",
+   "raw_feature": 0.521,
+   "probability": 0.521,
+   "label": 1
+  },
+  {
+   "external_id": "P28-1",
+   "cluster_id": "prob-conversation-28",
+   "split": "test",
+   "raw_feature": 0.908,
+   "probability": 0.908,
+   "label": 0
+  },
+  {
+   "external_id": "P29-0",
+   "cluster_id": "prob-conversation-29",
+   "split": "test",
+   "raw_feature": 0.331,
+   "probability": 0.331,
+   "label": 0
+  },
+  {
+   "external_id": "P29-1",
+   "cluster_id": "prob-conversation-29",
+   "split": "test",
+   "raw_feature": 0.622,
+   "probability": 0.622,
+   "label": 1
+  },
+  {
+   "external_id": "P30-0",
+   "cluster_id": "prob-conversation-30",
+   "split": "test",
+   "raw_feature": 0.767,
+   "probability": 0.767,
+   "label": 1
+  },
+  {
+   "external_id": "P30-1",
+   "cluster_id": "prob-conversation-30",
+   "split": "test",
+   "raw_feature": 0.782,
+   "probability": 0.782,
+   "label": 1
+  },
+  {
+   "external_id": "P31-0",
+   "cluster_id": "prob-conversation-31",
+   "split": "test",
+   "raw_feature": 0.051,
+   "probability": 0.051,
+   "label": 0
+  },
+  {
+   "external_id": "P31-1",
+   "cluster_id": "prob-conversation-31",
+   "split": "test",
+   "raw_feature": 0.068,
+   "probability": 0.068,
+   "label": 0
+  },
+  {
+   "external_id": "P32-0",
+   "cluster_id": "prob-conversation-32",
+   "split": "test",
+   "raw_feature": 0.876,
+   "probability": 0.876,
+   "label": 0
+  },
+  {
+   "external_id": "P32-1",
+   "cluster_id": "prob-conversation-32",
+   "split": "test",
+   "raw_feature": 0.339,
+   "probability": 0.339,
+   "label": 1
+  },
+  {
+   "external_id": "P33-0",
+   "cluster_id": "prob-conversation-33",
+   "split": "test",
+   "raw_feature": 0.875,
+   "probability": 0.875,
+   "label": 0
+  },
+  {
+   "external_id": "P33-1",
+   "cluster_id": "prob-conversation-33",
+   "split": "test",
+   "raw_feature": 0.131,
+   "probability": 0.131,
+   "label": 0
+  },
+  {
+   "external_id": "P34-0",
+   "cluster_id": "prob-conversation-34",
+   "split": "test",
+   "raw_feature": 0.115,
+   "probability": 0.115,
+   "label": 0
+  },
+  {
+   "external_id": "P34-1",
+   "cluster_id": "prob-conversation-34",
+   "split": "test",
+   "raw_feature": 0.77,
+   "probability": 0.77,
+   "label": 1
+  },
+  {
+   "external_id": "P35-0",
+   "cluster_id": "prob-conversation-35",
+   "split": "test",
+   "raw_feature": 0.497,
+   "probability": 0.497,
+   "label": 0
+  },
+  {
+   "external_id": "P35-1",
+   "cluster_id": "prob-conversation-35",
+   "split": "test",
+   "raw_feature": 0.299,
+   "probability": 0.299,
+   "label": 0
+  },
+  {
+   "external_id": "P36-0",
+   "cluster_id": "prob-conversation-36",
+   "split": "test",
+   "raw_feature": 0.448,
+   "probability": 0.448,
+   "label": 1
+  },
+  {
+   "external_id": "P36-1",
+   "cluster_id": "prob-conversation-36",
+   "split": "test",
+   "raw_feature": 0.557,
+   "probability": 0.557,
+   "label": 0
+  },
+  {
+   "external_id": "P37-0",
+   "cluster_id": "prob-conversation-37",
+   "split": "test",
+   "raw_feature": 0.239,
+   "probability": 0.239,
+   "label": 0
+  },
+  {
+   "external_id": "P37-1",
+   "cluster_id": "prob-conversation-37",
+   "split": "test",
+   "raw_feature": 0.985,
+   "probability": 0.985,
+   "label": 1
+  },
+  {
+   "external_id": "P38-0",
+   "cluster_id": "prob-conversation-38",
+   "split": "test",
+   "raw_feature": 0.462,
+   "probability": 0.462,
+   "label": 0
+  },
+  {
+   "external_id": "P38-1",
+   "cluster_id": "prob-conversation-38",
+   "split": "test",
+   "raw_feature": 0.164,
+   "probability": 0.164,
+   "label": 0
+  },
+  {
+   "external_id": "P39-0",
+   "cluster_id": "prob-conversation-39",
+   "split": "test",
+   "raw_feature": 0.368,
+   "probability": 0.368,
+   "label": 0
+  },
+  {
+   "external_id": "P39-1",
+   "cluster_id": "prob-conversation-39",
+   "split": "test",
+   "raw_feature": 0.266,
+   "probability": 0.266,
+   "label": 0
+  }
+ ]
+}

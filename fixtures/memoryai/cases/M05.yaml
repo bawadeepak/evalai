@@ -1,0 +1,17 @@
+external_id: M05
+purpose: A negated statement must not become a positive assertion that the user lives in Melbourne.
+severity: critical
+cluster_id: synthetic-person-05
+split: test
+tags: {language: en, temporal_update: false, negation: true, lifecycle: remember}
+episode:
+  - {id: e1, action: remember, args: {text: "I do not live in Melbourne."}}
+  - {id: s1, action: inspect_state}
+  - {id: r1, action: recall, args: {query: "Do I live in Melbourne?", level: mid, budget: 400}}
+  - {id: a1, action: generate, args: {question: "Do I live in Melbourne?", context_ref: r1.context}}
+expected:
+  forbidden_current_facts:
+    - {subject: user, relation: current_home, object: Melbourne}
+  evidence_steps: [e1, s1]
+evidence:
+  - {step: e1, role: negated_statement}

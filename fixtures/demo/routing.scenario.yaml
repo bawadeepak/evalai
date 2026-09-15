@@ -1,0 +1,43 @@
+schema_version: 1
+name: support-routing-regression
+pack: exact_classification
+contract: >-
+  Route each support message to exactly one allowed queue. Reply with JSON
+  {"label": "<queue>"}.
+description: >-
+  Demo regression suite with 24 independent clusters (one per message) so the
+  paired comparison can reach an automatic gate. Outputs are fixed demo
+  fixtures, not model measurements.
+slice_keys: [queue]
+allowed_labels: [billing, technical, account, other]
+graders:
+  - name: label
+    kind: deterministic
+    checks: [label_match]
+dataset:
+  name: support-routing-regression
+  cases:
+    - {external_id: R01, cluster_id: routing-01, split: regression, tags: {queue: billing}, input: {text: "Why was I charged $20 extra this month?"}, expected: {label: billing}}
+    - {external_id: R02, cluster_id: routing-02, split: regression, tags: {queue: technical}, input: {text: "The export button does nothing when I click it."}, expected: {label: technical}}
+    - {external_id: R03, cluster_id: routing-03, split: regression, tags: {queue: account}, input: {text: "How do I change the email address on my account?"}, expected: {label: account}}
+    - {external_id: R04, cluster_id: routing-04, split: regression, tags: {queue: other}, input: {text: "Do you have a physical office I can visit?"}, expected: {label: other}}
+    - {external_id: R05, cluster_id: routing-05, split: regression, tags: {queue: billing}, input: {text: "I need a copy of last month's invoice."}, expected: {label: billing}}
+    - {external_id: R06, cluster_id: routing-06, split: regression, tags: {queue: technical}, input: {text: "Sync keeps failing with error 504."}, expected: {label: technical}}
+    - {external_id: R07, cluster_id: routing-07, split: regression, severity: high, tags: {queue: account}, input: {text: "Please reset my two-factor authentication."}, expected: {label: account}}
+    - {external_id: R08, cluster_id: routing-08, split: regression, tags: {queue: billing}, input: {text: "Can I switch from monthly to annual billing?"}, expected: {label: billing}}
+    - {external_id: R09, cluster_id: routing-09, split: regression, tags: {queue: technical}, input: {text: "Dark mode text is unreadable on Android."}, expected: {label: technical}}
+    - {external_id: R10, cluster_id: routing-10, split: regression, tags: {queue: account}, input: {text: "I want to merge my two accounts."}, expected: {label: account}}
+    - {external_id: R11, cluster_id: routing-11, split: regression, severity: low, tags: {queue: other}, input: {text: "What does your company name mean?"}, expected: {label: other}}
+    - {external_id: R12, cluster_id: routing-12, split: regression, tags: {queue: billing}, input: {text: "My refund hasn't arrived after two weeks."}, expected: {label: billing}}
+    - {external_id: R13, cluster_id: routing-13, split: regression, tags: {queue: technical}, input: {text: "Notifications stopped arriving after the update."}, expected: {label: technical}}
+    - {external_id: R14, cluster_id: routing-14, split: regression, tags: {queue: account}, input: {text: "How do I add a teammate to my workspace?"}, expected: {label: account}}
+    - {external_id: R15, cluster_id: routing-15, split: regression, tags: {queue: billing}, input: {text: "The VAT number on my receipt is wrong."}, expected: {label: billing}}
+    - {external_id: R16, cluster_id: routing-16, split: regression, tags: {queue: technical}, input: {text: "Search results load forever."}, expected: {label: technical}}
+    - {external_id: R17, cluster_id: routing-17, split: regression, tags: {queue: account}, input: {text: "I forgot my username."}, expected: {label: account}}
+    - {external_id: R18, cluster_id: routing-18, split: regression, severity: low, tags: {queue: other}, input: {text: "Are you hiring interns?"}, expected: {label: other}}
+    - {external_id: R19, cluster_id: routing-19, split: regression, tags: {queue: billing}, input: {text: "Do you offer student discounts?"}, expected: {label: billing}}
+    - {external_id: R20, cluster_id: routing-20, split: regression, tags: {queue: technical}, input: {text: "The desktop app won't install on Windows 11."}, expected: {label: technical}}
+    - {external_id: R21, cluster_id: routing-21, split: regression, severity: high, tags: {queue: account}, input: {text: "Please close my account permanently."}, expected: {label: account}}
+    - {external_id: R22, cluster_id: routing-22, split: regression, tags: {queue: billing}, input: {text: "I was charged in USD but I live in Australia."}, expected: {label: billing}}
+    - {external_id: R23, cluster_id: routing-23, split: regression, tags: {queue: technical}, input: {text: "Two-factor codes aren't being sent by SMS."}, expected: {label: technical}, alternatives: [account]}
+    - {external_id: R24, cluster_id: routing-24, split: regression, severity: low, tags: {queue: other}, input: {text: "Can I suggest a feature?"}, expected: {label: other}}

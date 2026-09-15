@@ -1,0 +1,64 @@
+schema_version: 1
+name: person-fact-extraction
+pack: structured_extraction
+contract: >-
+  Extract durable facts as JSON {"facts": [{"subject", "relation", "object"}]}.
+  Use lower-case first names as subjects and only the relations lives_in,
+  works_at and owns. Do not turn negated statements into facts.
+description: Multiple entities, negation and an empty (no-fact) boundary case.
+slice_keys: [phenomenon]
+output_schema:
+  type: object
+  required: [facts]
+  properties:
+    facts:
+      type: array
+      items:
+        type: object
+        required: [subject, relation, object]
+        properties:
+          subject: {type: string}
+          relation: {type: string, enum: [lives_in, works_at, owns]}
+          object: {type: string}
+graders:
+  - name: schema
+    kind: deterministic
+    checks: [json_schema]
+  - name: facts
+    kind: structured
+    checks: [fact_match]
+    config: {matching: exact_normalized}
+dataset:
+  name: person-fact-extraction-smoke
+  cases:
+    - external_id: E01
+      purpose: Two facts about one person.
+      tags: {phenomenon: multi_fact}
+      input: {text: "Maria lives in Lisbon and works at Nova Bank."}
+      expected:
+        facts:
+          - {subject: maria, relation: lives_in, object: Lisbon}
+          - {subject: maria, relation: works_at, object: Nova Bank}
+    - external_id: E02
+      purpose: "Negation: no positive ownership fact may be extracted."
+      severity: high
+      tags: {phenomenon: negation}
+      input: {text: "Tom does not own a car."}
+      expected:
+        no_facts_required: true
+        forbidden_facts:
+          - {subject: tom, relation: owns, object: car}
+    - external_id: E03
+      purpose: Two entities sharing one fact; each gets its own triple.
+      tags: {phenomenon: multi_entity}
+      input: {text: "Ana and Ben both moved to Oslo."}
+      expected:
+        facts:
+          - {subject: ana, relation: lives_in, object: Oslo}
+          - {subject: ben, relation: lives_in, object: Oslo}
+    - external_id: E04
+      purpose: "Boundary: small talk yields an empty fact list, not an invented fact."
+      severity: low
+      tags: {phenomenon: empty}
+      input: {text: "Hello, how are you today?"}
+      expected: {no_facts_required: true}

@@ -1,0 +1,65 @@
+schema_version: 1
+description: >-
+  Fixed illustrative MemoryAI-shaped outputs for the labelled triage demo. These
+  are demo fixtures, not measurements of MemoryAI. Each variant describes the
+  final memory state and answer; the demo adapter expands it into the same step
+  outputs, recall evidence and state snapshots the real bridge produces.
+  `intended_verdict` documents what the deterministic graders should conclude;
+  tests verify the graders actually reach it. Repeat keys are zero-based
+  indices written as strings.
+kind: memory
+repeats: 20
+cases:
+  M03:
+    variants:
+      kept:
+        intended_verdict: pass
+        smalltalk: {e1: {outcome: kept, method: model, reason: "model found a durable fact"}}
+        facts:
+          - {claim: "The user moved to Perth last week.", source_step: e1}
+        answer: "You moved to Perth last week, so you live in Perth now."
+      dropped:
+        intended_verdict: fail
+        smalltalk: {e1: {outcome: skipped, method: model, reason: "small talk: nothing lasting to remember"}}
+        facts: []
+        answer: "I don't have any information about where you live."
+    schedule:
+      baseline: {default: kept}
+      candidate: {default: kept, repeats: {"3": dropped, "12": dropped}}
+  M06:
+    variants:
+      current_perth:
+        intended_verdict: pass
+        facts:
+          - {claim: "The user lived in Sydney.", source_step: e1, state: historical}
+          - {claim: "The user moved to Perth; Perth is the user's current home.", source_step: e2}
+        answer: "You currently live in Perth."
+      stale_sydney:
+        intended_verdict: fail
+        facts:
+          - {claim: "The user lives in Sydney.", source_step: e1}
+          - {claim: "The user moved to Perth.", source_step: e2}
+        answer: "You live in Sydney."
+    schedule:
+      baseline: {default: current_perth}
+      candidate: {default: current_perth, repeats: {"2": stale_sydney, "7": stale_sydney, "11": stale_sydney, "17": stale_sydney}}
+  M05:
+    variants:
+      correct_negation:
+        intended_verdict: pass
+        facts:
+          - {claim: "The user does not live in Melbourne.", source_step: e1}
+        answer: "No. You told me you do not live in Melbourne."
+      inverted:
+        intended_verdict: fail
+        facts:
+          - {claim: "The user lives in Melbourne.", source_step: e1}
+        answer: "Yes, you live in Melbourne."
+    schedule:
+      baseline: {default: correct_negation}
+      candidate: {default: inverted}
+judge:
+  # The demo judge agrees with the deterministic outcome except where listed: a
+  # malformed judgement twice in a row becomes a grading error, never a verdict.
+  failures:
+    - {case: M06, profile: candidate, repeat: 5}

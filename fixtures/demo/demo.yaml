@@ -1,0 +1,45 @@
+schema_version: 1
+label: Demo — synthetic results
+description: >-
+  Clearly labelled demonstration data. Every output comes from a fixed fixture
+  in this folder; nothing here is a measurement of MemoryAI or of any model.
+project:
+  name: Demo project (synthetic)
+  description: Seeded by `make demo`. All runs, outputs and probabilities are illustrative fixtures.
+judge:
+  name: judge
+  adapter: demo
+  model: demo-judge-v1
+suites:
+  - key: memory-triage
+    source: ../memoryai
+    include_cases: [M03, M06, M05]
+    dataset_name: memory-triage-demo
+    outputs: memory_outputs.yaml
+    repeats: 20
+    candidates:
+      - {key: baseline, name: "MemoryAI baseline v1 (demo)", model: demo-memory-v1, profile: baseline}
+      - {key: candidate, name: "MemoryAI candidate v2 (demo)", model: demo-memory-v2, profile: candidate}
+  - key: routing-regression
+    source: routing.scenario.yaml
+    outputs: routing_outputs.yaml
+    repeats: 5
+    candidates:
+      - {key: baseline, name: "Router baseline v1 (demo)", model: demo-router-v1, profile: baseline}
+      - {key: candidate, name: "Router candidate v2 (demo)", model: demo-router-v2, profile: candidate}
+probability:
+  records: probability_records.json
+  event_definition: the generated answer is correct
+  score_type: predicted_event_probability
+  method: judge stated confidence (demo)
+  source_version: demo-judge-v1
+release_policy:
+  name: Demo release policy
+  metrics:
+    - {name: case_pass_rate, direction: higher_is_better, margin: 0.05, required: true}
+  critical_invariants: []
+  min_paired_coverage: 1.0
+  min_independent_clusters: 20
+  confidence: 0.95
+  resamples: 10000
+  seed: 42

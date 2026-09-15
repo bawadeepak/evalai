@@ -1,0 +1,14 @@
+external_id: M13
+purpose: A question about a fact never supplied must be answered with abstention, not an invented personal fact.
+severity: high
+cluster_id: synthetic-person-13
+split: test
+tags: {language: en, temporal_update: false, negation: false, lifecycle: abstain}
+episode:
+  - {id: e1, action: remember, args: {text: "I like hiking on weekends."}}
+  - {id: r1, action: recall, args: {query: "What is my blood type?", level: mid, budget: 400}}
+  - {id: a1, action: generate, args: {question: "What is my blood type?", context_ref: r1.context}}
+expected:
+  should_abstain: true
+  invariants: [no_invented_personal_fact]
+  evidence_steps: [r1, a1]

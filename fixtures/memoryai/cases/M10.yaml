@@ -1,0 +1,21 @@
+external_id: M10
+purpose: Two users with similar names live in separate isolated stores; no evidence crosses between them.
+severity: critical
+cluster_id: synthetic-person-10
+split: test
+tags: {language: en, temporal_update: false, negation: false, lifecycle: isolation}
+episode:
+  - {id: e1, store: alex, action: remember, args: {text: "My name is Alex Chen and I live in Hobart."}}
+  - {id: e2, store: alexa, action: remember, args: {text: "My name is Alexa Chen and I live in Darwin."}}
+  - {id: r1, store: alex, action: recall, args: {query: "Where does Alex Chen live?", level: mid, budget: 400}}
+  - {id: a1, store: alex, action: generate, args: {question: "Where do I live?", context_ref: r1.context}}
+expected:
+  recall_excludes:
+    - {step: r1, text: Darwin}
+    - {step: r1, text: Alexa}
+  answer_contains: [Hobart]
+  answer_must_not_contain: [Darwin]
+  invariants: [no_cross_user_leak]
+  evidence_steps: [e1, r1]
+evidence:
+  - {step: e2, role: other_user_fact}

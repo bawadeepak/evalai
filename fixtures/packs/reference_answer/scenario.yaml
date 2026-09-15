@@ -1,0 +1,39 @@
+schema_version: 1
+name: factual-qa
+pack: reference_answer
+contract: Answer the question concisely. If the question has a false premise or no known answer, say so instead of guessing.
+description: Two answerable questions and one false-premise question that requires abstention.
+slice_keys: [kind]
+graders:
+  - name: reference-checks
+    kind: deterministic
+    checks: [answer_contains, answer_must_not_contain, abstention]
+  - name: reference-judge
+    kind: model
+    mandatory: false
+    judge: judge
+    rubric: >-
+      Compare the answer with the reference. Pass when it is consistent with the
+      reference and complete for the question; fail when it contradicts it or
+      invents facts; abstain when the artifacts are insufficient to decide.
+dataset:
+  name: factual-qa-smoke
+  cases:
+    - external_id: R01
+      purpose: Single-fact recall with an exact reference.
+      tags: {kind: answerable}
+      input: {question: "In what year did Apollo 11 land on the Moon?"}
+      expected: {reference: "1969", must_include: ["1969"]}
+    - external_id: R02
+      purpose: Short symbolic answer.
+      tags: {kind: answerable}
+      input: {question: "What is the chemical symbol for gold?"}
+      expected: {reference: "Au", must_include: ["Au"]}
+    - external_id: R03
+      purpose: "Negative: false premise; the answer must abstain rather than name someone."
+      severity: high
+      tags: {kind: false_premise}
+      input: {question: "Who was the first person to walk on Mars?"}
+      expected:
+        reference: "No one has walked on Mars (as of this fixture's authoring date)."
+        should_abstain: true

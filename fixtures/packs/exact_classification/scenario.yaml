@@ -1,0 +1,38 @@
+schema_version: 1
+name: support-routing
+pack: exact_classification
+contract: >-
+  Route each support message to exactly one allowed queue. Reply with JSON
+  {"label": "<queue>"}.
+description: Synthetic support messages with one clear, one ambiguous and one negative case.
+slice_keys: [difficulty]
+allowed_labels: [billing, technical, account, other]
+graders:
+  - name: label
+    kind: deterministic
+    checks: [label_match]
+dataset:
+  name: support-routing-smoke
+  cases:
+    - external_id: C01
+      purpose: Clear billing intent.
+      tags: {difficulty: easy}
+      input: {text: "I was charged twice for my subscription this month."}
+      expected: {label: billing}
+    - external_id: C02
+      purpose: Clear technical fault.
+      tags: {difficulty: easy}
+      input: {text: "The app crashes every time I open the settings page."}
+      expected: {label: technical}
+    - external_id: C03
+      purpose: "Boundary: account access and billing overlap; account is primary, billing is an allowed alternative."
+      tags: {difficulty: ambiguous}
+      input: {text: "I can't sign in since I updated my card details."}
+      expected: {label: account}
+      alternatives: [billing]
+    - external_id: C04
+      purpose: "Negative: no actionable intent must route to other rather than a guessed queue."
+      severity: low
+      tags: {difficulty: negative}
+      input: {text: "asdf qwerty zxcv"}
+      expected: {label: other}

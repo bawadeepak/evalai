@@ -1,0 +1,58 @@
+schema_version: 1
+name: library-rag
+pack: rag
+contract: >-
+  Retrieve the relevant library policy documents, then answer using only them.
+  Abstain when no document answers the question.
+description: Direct answer, multi-document answer, unanswerable query and a hard negative.
+slice_keys: [kind]
+corpus:
+  - {id: d1, title: Opening hours, text: "The Northside library is open 9am to 5pm on weekdays and 10am to 2pm on Saturdays. It is closed on Sundays."}
+  - {id: d2, title: Late fees, text: "Overdue books incur a fee of 20 cents per day, capped at $5 per item."}
+  - {id: d3, title: Membership, text: "Library membership is free for residents. Non-residents pay $30 per year."}
+  - {id: d4, title: Fee waivers, text: "Late fees are waived for members under 18."}
+  - {id: d5, title: Parking, text: "Parking behind the building is free for up to two hours."}
+  - {id: d6, title: Events, text: "Storytime runs every Wednesday at 10am in the children's area."}
+graders:
+  - name: retrieval
+    kind: deterministic
+    mandatory: false
+    checks: [retrieval]
+  - name: answer
+    kind: deterministic
+    checks: [answer_contains, answer_must_not_contain, abstention]
+  - name: grounding
+    kind: model
+    mandatory: false
+    judge: judge
+    rubric: >-
+      Is every claim in the answer supported by the retrieved documents? Pass if
+      all claims are supported; fail if any claim is unsupported or contradicted.
+dataset:
+  name: library-rag-smoke
+  cases:
+    - external_id: Q01
+      purpose: One relevant document.
+      tags: {kind: direct}
+      input: {question: "When is the library open on Saturdays?"}
+      expected: {relevant_ids: [d1], k: 3, answer_contains: ["10"]}
+    - external_id: Q02
+      purpose: Answer needs two documents; graded relevance favours the waiver.
+      tags: {kind: multi_doc}
+      input: {question: "Does a 16-year-old member pay late fees?"}
+      expected:
+        relevant_ids: [d4, d2]
+        relevance: {d4: 3, d2: 2}
+        k: 3
+        answer_contains: [waived]
+    - external_id: Q03
+      purpose: "Negative: nothing in the corpus answers this; abstain."
+      severity: high
+      tags: {kind: unanswerable}
+      input: {question: "Does the library rent bicycles?"}
+      expected: {intentional_no_answer: true, should_abstain: true, k: 3}
+    - external_id: Q04
+      purpose: "Hard negative: 'hours' appears in several documents; only parking is relevant."
+      tags: {kind: hard_negative}
+      input: {question: "How many hours can I park for free?"}
+      expected: {relevant_ids: [d5], k: 3, answer_contains: ["two hours"]}

@@ -1,0 +1,23 @@
+external_id: M07
+purpose: >-
+  A statement followed by "ignore what I just said" is retracted and must not be
+  active evidence. Note that MemoryAI's recall window may still show the original
+  turn, so the answer is checked separately from the fact state.
+severity: high
+cluster_id: synthetic-person-07
+split: test
+tags: {language: en, temporal_update: false, negation: false, lifecycle: retract}
+episode:
+  - {id: e1, action: remember, args: {text: "I live in Adelaide."}}
+  - {id: e2, action: remember, args: {text: "Ignore what I just said."}}
+  - {id: s1, action: inspect_state}
+  - {id: r1, action: recall, args: {query: "Where do I live?", level: mid, budget: 400}}
+  - {id: a1, action: generate, args: {question: "Where do I live?", context_ref: r1.context}}
+expected:
+  forbidden_current_facts:
+    - {subject: user, relation: current_home, object: Adelaide}
+  answer_must_not_contain: [Adelaide]
+  invariants: [no_retracted_fact_active]
+  evidence_steps: [e1, e2, s1]
+evidence:
+  - {step: e2, role: retraction}

@@ -1,0 +1,12 @@
+external_id: M02
+purpose: A pure acknowledgement carries no durable fact and must not create one.
+severity: medium
+cluster_id: synthetic-person-02
+split: test
+tags: {language: en, temporal_update: false, negation: false, lifecycle: small_talk}
+episode:
+  - {id: e1, action: remember, args: {text: "Thanks!"}}
+  - {id: s1, action: inspect_state}
+expected:
+  no_durable_fact: true
+  evidence_steps: [e1, s1]

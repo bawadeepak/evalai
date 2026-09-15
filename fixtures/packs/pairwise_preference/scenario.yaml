@@ -1,0 +1,34 @@
+schema_version: 1
+name: explanation-preference
+pack: pairwise_preference
+contract: Produce the more helpful response for the stated audience. Preference is not factual correctness.
+description: Blinded A/B comparison with position randomisation; ties and abstentions are reported separately.
+slice_keys: [audience]
+graders:
+  - name: preference
+    kind: pairwise
+    mandatory: true
+    judge: judge
+    rubric: >-
+      Which response better satisfies the prompt for its audience? Prefer
+      accuracy, then clarity, then brevity. Answer A, B, tie, or abstain, with a
+      short reason that quotes both responses.
+    config: {position_randomization: true, reversed_repeat: true}
+dataset:
+  name: explanation-preference-smoke
+  cases:
+    - external_id: P01
+      purpose: Audience-appropriate explanation.
+      tags: {audience: child}
+      input: {prompt: "Explain recursion to a ten-year-old in three sentences."}
+      expected: {rubric_focus: "age-appropriate analogy"}
+    - external_id: P02
+      purpose: Tone and brevity.
+      tags: {audience: professional}
+      input: {prompt: "Write a polite two-sentence email declining a meeting invitation."}
+      expected: {rubric_focus: "politeness and brevity"}
+    - external_id: P03
+      purpose: "Boundary: two short tips; equivalent answers should be judged a tie."
+      tags: {audience: developer}
+      input: {prompt: "Give two tips for writing clear commit messages."}
+      expected: {rubric_focus: "specific, actionable tips", allow_tie: true}

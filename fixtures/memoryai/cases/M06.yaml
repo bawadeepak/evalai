@@ -1,0 +1,21 @@
+external_id: M06
+purpose: After an explicit move, the current answer is Perth; the historical Sydney fact must not override it.
+severity: high
+cluster_id: synthetic-person-06
+split: test
+tags: {language: en, temporal_update: true, negation: false, lifecycle: update}
+episode:
+  - {id: e1, action: remember, args: {text: "I live in Sydney."}}
+  - {id: e2, action: remember, args: {text: "I moved to Perth. Perth is my current home."}}
+  - {id: s1, action: inspect_state}
+  - {id: r1, action: recall, args: {query: "Where do I currently live?", level: mid, budget: 400}}
+  - {id: a1, action: generate, args: {question: "Where do I currently live?", context_ref: r1.context}}
+expected:
+  required_facts:
+    - {subject: user, relation: current_home, object: Perth, source_step: e2}
+  answer_contains: [Perth]
+  answer_must_not_contain: [Sydney]
+  evidence_steps: [e2, r1]
+evidence:
+  - {step: e2, role: current_fact_source}
+  - {step: e1, role: historical_fact}

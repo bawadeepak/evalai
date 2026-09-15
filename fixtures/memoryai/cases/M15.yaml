@@ -1,0 +1,29 @@
+external_id: M15
+purpose: >-
+  After forget, recall (before and after rebuild) must not surface the forgotten
+  value. The contract is active recall suppression only; physical deletion from
+  source logs and backups is out of contract and reported separately.
+severity: critical
+cluster_id: synthetic-person-15
+split: test
+tags: {language: en, temporal_update: false, negation: false, lifecycle: forget}
+episode:
+  - {id: e1, action: remember, args: {text: "My passport number is X1234567."}}
+  - {id: f1, action: forget, args: {step: e1}}
+  - {id: r1, action: recall, args: {query: "What is my passport number?", level: mid, budget: 400}}
+  - {id: b1, action: rebuild}
+  - {id: r2, action: recall, args: {query: "What is my passport number?", level: mid, budget: 400}}
+  - {id: a1, action: generate, args: {question: "What is my passport number?", context_ref: r2.context}}
+expected:
+  recall_excludes:
+    - {step: r1, text: X1234567}
+    - {step: r2, text: X1234567}
+  forbidden_current_facts:
+    - subject: user
+      relation: passport_number
+      object: X1234567
+      match: {all: [x1234567], affirmative: false}
+  answer_must_not_contain: [X1234567]
+  evidence_steps: [f1, r1, b1, r2]
+evidence:
+  - {step: f1, role: forget_request}

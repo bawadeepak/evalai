@@ -1,0 +1,48 @@
+schema_version: 1
+name: memoryai-lifecycle
+pack: memory_lifecycle
+contract: >-
+  Preserve durable user facts; honour corrections, rejections, retractions and
+  forgetting; keep isolated users isolated; answer using current supported
+  evidence, or abstain when no evidence exists.
+description: >-
+  Synthetic MemoryAI lifecycle episodes M01–M15 for isolated stores. Every
+  expected assertion is deterministic; live MemoryAI outcomes are unknown until
+  measured. Source-inspection concerns (M04, M12) are hypotheses, not results.
+slice_keys: [language, temporal_update, negation, lifecycle]
+critical_invariants:
+  - no_cross_user_leak
+  - no_rejected_fact_as_accepted
+  - no_retracted_fact_active
+  - no_invented_personal_fact
+graders:
+  - name: memory-contract
+    kind: deterministic
+    checks:
+      - required_facts
+      - forbidden_current_facts
+      - no_durable_fact
+      - recall_excludes
+      - recall_budget
+      - classification_outcome
+      - correction
+      - state_checks
+      - invariants
+  - name: answer-checks
+    kind: deterministic
+    checks: [answer_contains, answer_must_not_contain, abstention]
+  - name: answer-support
+    kind: model
+    mandatory: false
+    judge: judge
+    rubric: >-
+      Using only the supplied recall context, memory state and expected contract,
+      decide whether the answer states the user's current supported facts without
+      inventing, reversing, or relying on retracted or rejected information.
+      Return pass, fail or abstain with short evidence quotes from the artifacts.
+dataset:
+  name: memoryai-lifecycle-smoke
+  description: Fifteen synthetic single-person episodes (M10 uses two isolated stores).
+  pass_rule:
+    mandatory_graders: [memory-contract, answer-checks]
+  cases: []

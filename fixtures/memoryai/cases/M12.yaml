@@ -1,0 +1,22 @@
+external_id: M12
+purpose: >-
+  Many facts with a very small recall budget. The true used budget and the
+  overflow/truncation behaviour must be reported; exceeding the requested budget
+  fails this contract. (Inspection hypothesis: the facts block is not trimmed.)
+severity: medium
+cluster_id: synthetic-person-12
+split: test
+tags: {language: en, temporal_update: false, negation: false, lifecycle: budget}
+episode:
+  - {id: e1, action: remember, args: {text: "I live in Brisbane."}}
+  - {id: e2, action: remember, args: {text: "I work as a nurse at the Royal Brisbane hospital."}}
+  - {id: e3, action: remember, args: {text: "My partner is called Sam."}}
+  - {id: e4, action: remember, args: {text: "I have two cats named Miso and Tofu."}}
+  - {id: e5, action: remember, args: {text: "I am learning Japanese on weekday evenings."}}
+  - {id: e6, action: remember, args: {text: "My favourite food is laksa."}}
+  - {id: e7, action: remember, args: {text: "I play netball on Saturdays."}}
+  - {id: e8, action: remember, args: {text: "I am saving for a trip to Hokkaido next winter."}}
+  - {id: r1, action: recall, args: {query: "Tell me everything you know about me.", level: high, budget: 40}}
+expected:
+  recall_budget: {step: r1}
+  evidence_steps: [r1]

@@ -1,0 +1,21 @@
+external_id: M09
+purpose: >-
+  A fact marked wrong is either re-invalidated after rebuild or reported as an
+  unresolved correction; it is never silently reinstated. Rebuild regenerates
+  fact ids, so matching uses claims and provenance, not UUIDs.
+severity: high
+cluster_id: synthetic-person-09
+split: test
+tags: {language: en, temporal_update: false, negation: false, lifecycle: correct_rebuild}
+episode:
+  - {id: e1, action: remember, args: {text: "I work at Acme Corp."}}
+  - {id: s1, action: inspect_state}
+  - {id: w1, action: wrong, args: {step: e1, claim_contains: acme}}
+  - {id: b1, action: rebuild}
+  - {id: s2, action: inspect_state}
+expected:
+  correction: {step: e1, claim_contains: acme}
+  evidence_steps: [w1, b1, s2]
+evidence:
+  - {step: w1, role: correction}
+  - {step: b1, role: rebuild}
