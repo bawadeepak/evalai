@@ -263,7 +263,7 @@ def _memory_backend(app: AppContext, config: TargetConfig, case: dict[str, Any])
     if config.adapter == "memoryai":
         from eval_triage.adapters.memoryai.adapter import memory_backend
 
-        return memory_backend(app.settings, config), {}
+        return memory_backend(app, config), {}
     raise ValueError(f"adapter {config.adapter} cannot run memory episodes")
 
 

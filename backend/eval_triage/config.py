@@ -32,6 +32,12 @@ class Settings(BaseSettings):
     worker_poll_seconds: float = 0.5
     worker_slots: int = 4
 
+    # MemoryAI bridge environment. Hugging Face runs offline so nothing is downloaded
+    # implicitly; point TIKTOKEN_CACHE_DIR at an existing tokenizer cache when the
+    # worker's temporary directory differs from the one MemoryAI used.
+    memoryai_hf_offline: bool = True
+    tiktoken_cache_dir: Path | None = None
+
     # Serve the built frontend from the API process when present.
     frontend_dist: Path = REPO_ROOT / "frontend" / "dist"
 

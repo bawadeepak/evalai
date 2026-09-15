@@ -100,6 +100,27 @@ def create_target_config(session, project_id: str, *, name: str, adapter: str, m
         raise DefinitionError("model is required; Eval Triage never invents a default model name")
     if adapter == "openai_compatible" and not base_url:
         raise DefinitionError("the local OpenAI-compatible adapter needs an explicit base_url")
+    if adapter == "memoryai":
+        from urllib.parse import urlparse
+
+        from eval_triage.adapters.memoryai.adapter import CLOUD_BOUNDARY
+
+        memory_config = dict(memory_config or {})
+        if memory_config.setdefault("backend", "real") not in ("real", "fake"):
+            raise DefinitionError("memory_config.backend must be 'real' or 'fake'")
+        # MemoryAI's own Settings defaults; stated in the configuration rather than implied.
+        memory_config.setdefault("llm_model", model or "gemma3:4b")
+        url = memory_config.setdefault("llm_base_url", "http://localhost:11434/v1")
+        if urlparse(url).hostname not in ("localhost", "127.0.0.1", "::1"):
+            raise DefinitionError(CLOUD_BOUNDARY)
+        memory_config.setdefault("small_talk_filter", True)
+        memory_config.setdefault("retain_stores", True)
+        generation = memory_config.get("generation_target_config_id")
+        if generation:
+            target = session.get(TargetConfigVersion, generation)
+            if target is None or target.project_id != project_id or target.adapter == "memoryai":
+                raise DefinitionError("generation_target_config_id must name a non-MemoryAI target in this project")
+        model = memory_config["llm_model"]
     credential_ref = validate_credential_ref(credential_ref if credential_ref is not None
                                              else info["credential_default"])
     implementation = get_adapter(adapter)

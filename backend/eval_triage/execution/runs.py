@@ -172,6 +172,19 @@ def validate_run(session, settings: Settings, request: RunRequest) -> dict[str, 
         if pack == "tool_agent" and (caps.get("tools") or {}).get("state") == "unsupported":
             errors.append(_err(f"{field}.target_config_id", f"{config.name} does not support tools",
                                "capability_conflict"))
+        if config.adapter == "memoryai":
+            memory = config.memory_config or {}
+            if memory.get("backend", "real") == "real" and not (settings.memoryai_source_path.is_dir()
+                                                                and settings.resolved_memoryai_python.exists()):
+                errors.append(_err(f"{field}.target_config_id", "MemoryAI prerequisites missing: set "
+                                                                "MEMORYAI_SOURCE_PATH and MEMORYAI_PYTHON",
+                                   "prerequisite_missing"))
+            if any(step.get("action") == "generate" for case in cases for step in case.episode) and not memory.get(
+                    "generation_target_config_id"):
+                errors.append(_err(f"{field}.target_config_id", "episodes with generate steps need "
+                                                                "memory_config.generation_target_config_id (MemoryAI's "
+                                                                "recall returns context, not an answer)",
+                                   "generation_target_missing"))
         if config.credential_ref and not os.environ.get(config.credential_ref):
             errors.append(_err(f"{field}.target_config_id", f"credential {config.credential_ref} is not set in "
                                                             "the server environment", "credential_missing"))

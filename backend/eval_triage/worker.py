@@ -160,6 +160,11 @@ class Worker:
         finally:
             if self.active:
                 await asyncio.gather(*self.active, return_exceptions=True)
+            import sys as _sys
+
+            bridges = _sys.modules.get("eval_triage.adapters.memoryai.bridge_client")
+            if bridges is not None:
+                await bridges.close_all()
             await asyncio.to_thread(jobs.unregister_worker, self.ctx.db, self.worker_id)
         return 0
 
