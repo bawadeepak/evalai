@@ -1,0 +1,67 @@
+[project]
+name = "evalai"
+version = "0.1.0"
+description = "Eval Triage: local evaluation, failure triage and evidence-based release gates for LLM applications"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "pydantic>=2.8",
+    "pydantic-settings>=2.4",
+    "sqlalchemy>=2.0.30",
+    "alembic>=1.13",
+    "sse-starlette>=2.1",
+    "httpx>=0.27",
+    "numpy>=2.0",
+    "scipy>=1.14",
+    "scikit-learn>=1.5",
+    "openai>=1.50",
+    "anthropic>=0.40",
+    "pyyaml>=6.0",
+    "jsonschema>=4.23",
+]
+
+[project.scripts]
+evalai = "eval_triage.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "respx>=0.21",
+    "hypothesis>=6.100",
+    "ruff>=0.6",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["backend/eval_triage"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+addopts = "-m 'not live_memoryai and not live_provider' -p no:cacheprovider"
+markers = [
+    "unit: pure unit tests",
+    "integration: API, worker and process integration tests",
+    "live_memoryai: runs the real MemoryAI runtime in isolated stores (needs Ollama)",
+    "live_provider: makes real provider calls (may cost money)",
+]
+filterwarnings = ["error::DeprecationWarning:eval_triage.*"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+src = ["backend", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+ignore = ["E501"]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Query", "fastapi.Header", "fastapi.Body", "fastapi.Path"]

@@ -1,0 +1,117 @@
+<section id="eval-triage-preview" aria-label="Eval Triage interface preview">
+  <style>
+    #eval-triage-preview { --et-bg:light-dark(#f5f6f8,#15191f); --et-surface:light-dark(#ffffff,#1c222a); --et-ink:light-dark(#202c37,#e9edf2); --et-muted:light-dark(#596676,#a5b2c1); --et-line:light-dark(#dce2e8,#35404d); --et-accent:light-dark(#176c61,#77d6c3); --et-selected:light-dark(#e9f4f0,#203e39); --et-warning:light-dark(#8b4a13,#ffbc7b); --et-warningbg:light-dark(#fff2df,#45301f); color:var(--et-ink); background:var(--et-bg); font-family:Inter,system-ui,sans-serif; font-size:14px; line-height:1.5; border:1px solid var(--et-line); border-radius:12px; overflow:hidden; }
+    #eval-triage-preview * { box-sizing:border-box; }
+    #eval-triage-preview .et-header { display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap; padding:19px 22px; border-bottom:1px solid var(--et-line); background:var(--et-surface); align-items:center; }
+    #eval-triage-preview .et-brand { font-size:20px; font-weight:500; letter-spacing:-.5px; display:flex; align-items:center; gap:10px; }
+    #eval-triage-preview .et-mark { color:var(--et-accent); }
+    #eval-triage-preview .et-muted { color:var(--et-muted); }
+    #eval-triage-preview .et-small { font-size:12px; }
+    #eval-triage-preview .et-chip { padding:4px 9px; background:var(--et-bg); border-radius:6px; font-size:12px; white-space:nowrap; }
+    #eval-triage-preview .et-topline { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; padding:17px 22px; }
+    #eval-triage-preview .et-layout { display:grid; grid-template-columns:230px minmax(0,1fr); align-items:start; }
+    #eval-triage-preview .et-queue { padding:0 12px 18px; }
+    #eval-triage-preview .et-queue h3 { font-size:12px; font-weight:500; color:var(--et-muted); padding:0 10px; margin:0 0 10px; text-transform:uppercase; letter-spacing:1px; }
+    #eval-triage-preview button { font:inherit; color:inherit; cursor:pointer; }
+    #eval-triage-preview .et-case { display:block; text-align:left; width:100%; border:1px solid transparent; background:transparent; border-radius:8px; padding:14px 10px; margin:0 0 5px; }
+    #eval-triage-preview .et-case[aria-pressed=true] { border-color:var(--et-accent); background:var(--et-selected); }
+    #eval-triage-preview .et-case span { display:block; }
+    #eval-triage-preview .et-case .et-case-title { font-weight:500; margin:3px 0; }
+    #eval-triage-preview .et-detail { background:var(--et-surface); border:1px solid var(--et-line); border-radius:10px; margin:0 18px 18px 0; min-width:0; }
+    #eval-triage-preview .et-detailhead { padding:18px; border-bottom:1px solid var(--et-line); display:flex; align-items:start; justify-content:space-between; gap:12px; }
+    #eval-triage-preview h2 { font-size:18px; font-weight:500; margin:0 0 4px; letter-spacing:-.3px; }
+    #eval-triage-preview .et-status { background:var(--et-warningbg); color:var(--et-warning); padding:4px 9px; border-radius:6px; font-size:12px; white-space:nowrap; }
+    #eval-triage-preview .et-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; padding:16px 18px; border-bottom:1px solid var(--et-line); }
+    #eval-triage-preview .et-value { font-size:23px; font-weight:500; font-variant-numeric:tabular-nums; margin:3px 0; }
+    #eval-triage-preview .et-evidence { padding:18px; }
+    #eval-triage-preview .et-sectiontitle { font-size:12px; color:var(--et-muted); margin:0 0 7px; text-transform:uppercase; letter-spacing:.8px; }
+    #eval-triage-preview .et-input { padding:11px 13px; border-left:3px solid var(--et-accent); background:var(--et-bg); margin-bottom:16px; }
+    #eval-triage-preview .et-pair { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    #eval-triage-preview .et-output { padding:12px; background:var(--et-bg); border-radius:6px; min-height:76px; overflow-wrap:anywhere; }
+    #eval-triage-preview .et-output.et-failure { background:var(--et-warningbg); }
+    #eval-triage-preview .et-note { margin-top:14px; }
+    #eval-triage-preview .et-trials { display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
+    #eval-triage-preview .et-trial { width:23px; height:23px; border-radius:4px; background:var(--et-selected); color:var(--et-accent); text-align:center; line-height:23px; font-size:12px; }
+    #eval-triage-preview .et-trial.et-bad { color:var(--et-warning); background:var(--et-warningbg); }
+    #eval-triage-preview .et-footer { padding:14px 18px; border-top:1px solid var(--et-line); display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    #eval-triage-preview .et-action { border:1px solid var(--et-line); border-radius:6px; padding:8px 11px; background:var(--et-surface); }
+    #eval-triage-preview .et-action.et-primary { background:var(--et-ink); color:var(--et-surface); border-color:var(--et-ink); }
+    #eval-triage-preview .et-review { width:100%; margin-top:3px; font-size:12px; color:var(--et-muted); }
+    #eval-triage-preview[data-compact=true] .et-case { padding:9px 10px; }
+    #eval-triage-preview[data-compact=true] .et-evidence { padding:12px 18px; }
+    @media(max-width:720px) { #eval-triage-preview .et-layout { grid-template-columns:1fr; } #eval-triage-preview .et-queue { display:flex; flex-wrap:wrap; gap:6px; } #eval-triage-preview .et-queue h3 { width:100%; } #eval-triage-preview .et-case { flex:1 1 150px; width:auto; } #eval-triage-preview .et-detail { margin-left:12px; margin-right:12px; } }
+    @media(max-width:450px) { #eval-triage-preview .et-metrics { grid-template-columns:1fr; } #eval-triage-preview .et-pair { grid-template-columns:1fr; } #eval-triage-preview .et-detailhead { flex-wrap:wrap; } }
+  </style>
+  <header class="et-header">
+    <div class="et-brand"><i class="et-mark" data-lucide="scan-line" aria-hidden="true"></i>Eval Triage</div>
+    <span class="et-chip">Design preview · synthetic results</span>
+  </header>
+  <div class="et-topline">
+    <div><strong>Triage</strong> <span class="et-muted">/ MemoryAI pilot</span></div>
+    <span class="et-small et-muted">Baseline v1 → Candidate v2 · 20 repeats per case</span>
+  </div>
+  <div class="et-layout">
+    <aside class="et-queue" aria-label="Illustrative failure queue">
+      <h3>Needs review · 3 cases</h3>
+      <button type="button" class="et-case" data-case="0" aria-pressed="true"><span class="et-small et-muted">M03 · EXTRACTION</span><span class="et-case-title">Greeting hides a fact</span><span class="et-small">2 of 20 trials fail</span></button>
+      <button type="button" class="et-case" data-case="1" aria-pressed="false"><span class="et-small et-muted">M06 · MEMORY UPDATE</span><span class="et-case-title">Old location recalled</span><span class="et-small">4 of 20 trials fail</span></button>
+      <button type="button" class="et-case" data-case="2" aria-pressed="false"><span class="et-small et-muted">M05 · NEGATION</span><span class="et-case-title">Consistently incorrect</span><span class="et-small">20 of 20 trials fail</span></button>
+    </aside>
+    <article class="et-detail" aria-live="polite">
+      <div class="et-detailhead"><div><h2 id="et-title">Greeting hides a fact</h2><div class="et-small et-muted" id="et-subtitle">Durable-fact extraction · exact structured check</div></div><span class="et-status" id="et-status">Observed flaky case</span></div>
+      <div class="et-metrics">
+        <div><div class="et-small et-muted">Candidate task passes</div><div class="et-value" id="et-pass">18 / 20</div><div class="et-small et-muted" id="et-interval">95% interval: 69.9–97.2%</div></div>
+        <div><div class="et-small et-muted">Exact output agreement</div><div class="et-value" id="et-agreement">81.1%</div><div class="et-small et-muted">Pairwise · canonical output</div></div>
+        <div><div class="et-small et-muted">Correctness prediction</div><div class="et-value">Unavailable</div><div class="et-small et-muted">No validated calibrator</div></div>
+      </div>
+      <div class="et-evidence">
+        <div class="et-sectiontitle">Input</div><div class="et-input" id="et-input">Thanks! I moved to Perth last week.</div>
+        <div class="et-pair">
+          <div><div class="et-sectiontitle">Expected</div><div class="et-output" id="et-expected">Retain the move to Perth, with its relative timing.</div></div>
+          <div><div class="et-sectiontitle">Failed trial</div><div class="et-output et-failure" id="et-actual">No fact retained. Classified as small talk.</div></div>
+        </div>
+        <div class="et-note et-small" id="et-evidence-note">Evidence: the message states a durable change despite starting with an acknowledgement.</div>
+        <div class="et-note"><div class="et-sectiontitle">Candidate trials · ✓ pass / × fail</div><div class="et-trials" id="et-trials" role="img" aria-label="18 successful and 2 unsuccessful trials"></div></div>
+        <div class="et-note et-small et-muted" id="et-baseline">Baseline: 20 / 20 pass · Candidate: 18 / 20 pass · Illustrative results</div>
+      </div>
+      <footer class="et-footer">
+        <button type="button" class="et-action et-primary" data-review="Confirmed failure">Confirm failure</button>
+        <button type="button" class="et-action" data-review="Acceptable variation">Accept variation</button>
+        <button type="button" class="et-action" data-review="Needs adjudication">Mark ambiguous</button>
+        <div class="et-review" id="et-review">Preview only · review choices stay in this view</div>
+      </footer>
+    </article>
+  </div>
+  <script>
+    (() => {
+      const root=document.getElementById('eval-triage-preview');
+      const cases=[
+        {title:'Greeting hides a fact',subtitle:'Durable-fact extraction · exact structured check',input:'Thanks! I moved to Perth last week.',expected:'Retain the move to Perth, with its relative timing.',actual:'No fact retained. Classified as small talk.',note:'Evidence: the message states a durable change despite starting with an acknowledgement.',passes:18,baseline:20,counts:[18,2]},
+        {title:'Old location recalled',subtitle:'Memory update · whole-episode outcome',input:'Earlier: I live in Sydney. Later: I have moved to Perth. Query: Where do I live now?',expected:'Perth is the current location. Sydney can remain as historical evidence.',actual:'The answer uses Sydney as the current location.',note:'Evidence: the later explicit update takes precedence for the current-location question.',passes:16,baseline:20,counts:[16,4]},
+        {title:'Consistently incorrect',subtitle:'Negation handling · fact correctness',input:'I do not live in Melbourne.',expected:'Do not assert Melbourne as a positive current location.',actual:'Retained fact: the user lives in Melbourne.',note:'Evidence: every illustrative trial reverses the negation. Identical outputs do not imply correctness.',passes:0,baseline:20,counts:[20]}
+      ];
+      let selected=0;
+      const reviews={};
+      const design={compact:false};
+      function render(){
+        const c=cases[selected],n=20,z=1.959963984540054,p=c.passes/n,d=1+z*z/n;
+        const center=(p+z*z/(2*n))/d,half=z*Math.sqrt(p*(1-p)/n+z*z/(4*n*n))/d;
+        const agreement=c.counts.reduce((a,x)=>a+x*(x-1),0)/(n*(n-1));
+        const set=(id,text)=>root.querySelector('#'+id).textContent=text;
+        set('et-title',c.title);set('et-subtitle',c.subtitle);set('et-input',c.input);set('et-expected',c.expected);set('et-actual',c.actual);set('et-evidence-note',c.note);
+        set('et-pass',c.passes+' / '+n);set('et-interval','95% interval: '+(Math.max(0,center-half)*100).toFixed(1)+'–'+(Math.min(1,center+half)*100).toFixed(1)+'%');
+        set('et-agreement',(agreement*100).toFixed(1)+'%');set('et-status',c.passes===0?'Repeatable failure':'Observed flaky case');
+        set('et-baseline','Baseline: '+c.baseline+' / 20 pass · Candidate: '+c.passes+' / 20 pass · Illustrative results');
+        set('et-review',reviews[selected]?'Preview decision: '+reviews[selected]+' · not saved to MemoryAI':'Preview only · review choices stay in this view');
+        const trials=root.querySelector('#et-trials');trials.replaceChildren();trials.setAttribute('aria-label',c.passes+' successful and '+(n-c.passes)+' unsuccessful trials');
+        for(let i=0;i<n;i++){const span=document.createElement('span');span.className='et-trial'+(i<c.passes?'':' et-bad');span.textContent=i<c.passes?'✓':'×';span.setAttribute('aria-hidden','true');trials.append(span);}
+        root.querySelectorAll('[data-case]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.case)===selected)));
+        root.dataset.compact=String(design.compact);
+      }
+      root.querySelectorAll('[data-case]').forEach(b=>b.addEventListener('click',()=>{selected=Number(b.dataset.case);render();}));
+      root.querySelectorAll('[data-review]').forEach(b=>b.addEventListener('click',()=>{reviews[selected]=b.dataset.review;render();}));
+      render();
+      if(globalThis.Tweak){const tweak=new Tweak({container:root,onChange:render});tweak.addToggle(design,'compact',{label:'Compact evidence layout'});}
+    })();
+  </script>
+</section>
