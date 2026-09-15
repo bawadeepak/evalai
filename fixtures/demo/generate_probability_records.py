@@ -2,8 +2,9 @@
 
 Synthetic, clearly labelled demo data: a stated-confidence score that is
 systematically overconfident (true success probability = score ** 1.8), grouped
-into 40 conversation clusters of two records. Clusters 0–19 form the
-calibration split and 20–39 the held-out test split, so no cluster spans splits.
+into 80 conversation clusters of two records. Clusters 0–39 form the
+calibration split and 40–79 the held-out test split, so no cluster spans splits
+and each split clears the 30-cluster calibration floor.
 
 Run: ``uv run python fixtures/demo/generate_probability_records.py``
 """
@@ -20,8 +21,8 @@ OUT = Path(__file__).with_name("probability_records.json")
 def generate() -> list[dict]:
     rng = random.Random(42)
     records = []
-    for cluster in range(40):
-        split = "calibration" if cluster < 20 else "test"
+    for cluster in range(80):
+        split = "calibration" if cluster < 40 else "test"
         for item in range(2):
             score = round(rng.uniform(0.05, 0.99), 3)
             label = 1 if rng.random() < score ** 1.8 else 0

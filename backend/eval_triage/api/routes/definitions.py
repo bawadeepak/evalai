@@ -112,6 +112,8 @@ class ScenarioCreate(BaseModel):
     document: dict[str, Any]
     judges: dict[str, str] = Field(default_factory=dict)
     dataset_name: str | None = None
+    parent_id: str | None = None  # "edit as new version": the new row joins the parent's logical id
+    reason: str = Field(default="", max_length=2000)
 
 
 class TextImport(BaseModel):
@@ -153,8 +155,15 @@ def create_scenario(body: ScenarioCreate, ctx: AppContext = Depends(get_ctx)) ->
     try:
         with ctx.db.write() as session:
             _project(session, body.project_id)
+            logical_id = None
+            if body.parent_id:
+                parent = session.get(ScenarioVersion, body.parent_id)
+                if parent is None or parent.project_id != body.project_id:
+                    raise not_found("scenario", body.parent_id)
+                logical_id = parent.logical_id
             result = import_document(session, body.project_id, body.document, judges=body.judges,
-                                     dataset_name=body.dataset_name, provenance={"source": "api"})
+                                     dataset_name=body.dataset_name, provenance={"source": "api"},
+                                     logical_id=logical_id, parent_id=body.parent_id, reason=body.reason)
             return envelope({"scenario": ser.scenario(result["scenario"], full=True),
                              "dataset": ser.dataset(result["dataset"]) if result["dataset"] else None,
                              "graders": [ser.grader(g) for g in result["graders"]],

@@ -34,6 +34,14 @@ def new_project(body: ProjectRequest, ctx: AppContext = Depends(get_ctx)) -> dic
         return envelope(ser.project(create_project(session, body.name, body.description)))
 
 
+@router.post("/demo", status_code=201)
+def load_demo(ctx: AppContext = Depends(get_ctx)) -> dict:
+    """Seed the clearly labelled demo project (idempotent); a worker executes its runs."""
+    from eval_triage.demo import seed_demo
+
+    return envelope(seed_demo(ctx.settings, ctx))
+
+
 @router.get("/projects/{project_id}")
 def get_project(project_id: str, ctx: AppContext = Depends(get_ctx)) -> dict:
     with ctx.db.read() as session:

@@ -1,0 +1,9 @@
+/* Slider (Radix) */
+.slider { position: relative; display: flex; align-items: center; user-select: none; touch-action: none; width: 100%; height: 24px; }
+.slider-track { position: relative; flex-grow: 1; height: 6px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); }
+.slider-range { position: absolute; height: 100%; border-radius: 999px; background: var(--accent); }
+.slider-thumb { display: block; width: 20px; height: 20px; border-radius: 50%; background: var(--surface); border: 2px solid var(--accent); box-shadow: var(--shadow); cursor: grab; }
+.slider-thumb:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+details > summary { cursor: pointer; }
+ins { text-decoration: none; }

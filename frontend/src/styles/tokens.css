@@ -1,0 +1,55 @@
+/* Design tokens. Palette follows docs/UI_PREVIEW.html; every pair used for
+   text is checked for WCAG AA contrast in tests (src/styles/contrast.test.ts). */
+
+:root {
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --surface-2: #eef1f4;
+  --ink: #202c37;
+  --muted: #596676;
+  --line: #dce2e8;
+  --line-strong: #c2cbd4;
+  --accent: #176c61;
+  --accent-ink: #ffffff;
+  --selected: #e9f4f0;
+  --warning: #8b4a13;
+  --warning-bg: #fff2df;
+  --danger: #a4161a;
+  --danger-bg: #fde8e8;
+  --info: #1d4f91;
+  --info-bg: #e7effb;
+  --unavailable: #525c68;
+  --unavailable-bg: #eceff2;
+  --focus: #1d63d6;
+  --shadow: 0 1px 2px rgb(16 24 40 / 6%), 0 1px 3px rgb(16 24 40 / 8%);
+  --radius: 8px;
+  --radius-sm: 6px;
+  --font: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --nav-width: 224px;
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --bg: #15191f;
+  --surface: #1c222a;
+  --surface-2: #232a33;
+  --ink: #e9edf2;
+  --muted: #a5b2c1;
+  --line: #35404d;
+  --line-strong: #4a5664;
+  --accent: #77d6c3;
+  --accent-ink: #0d2420;
+  --selected: #203e39;
+  --warning: #ffbc7b;
+  --warning-bg: #45301f;
+  --danger: #ff9f9a;
+  --danger-bg: #4a2222;
+  --info: #9cc3ff;
+  --info-bg: #1d2d45;
+  --unavailable: #b4bfcc;
+  --unavailable-bg: #2a313a;
+  --focus: #8ab4ff;
+  --shadow: 0 1px 2px rgb(0 0 0 / 30%);
+  color-scheme: dark;
+}

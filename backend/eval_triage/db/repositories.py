@@ -228,8 +228,13 @@ def create_dataset_version(session, project_id: str, scenario_row: ScenarioVersi
 
 def import_document(session, project_id: str, raw: Any, *, judges: dict[str, str] | None = None,
                     provenance: dict | None = None, dataset_name: str | None = None,
-                    is_demo: bool = False) -> dict[str, Any]:
-    """Validate and store a scenario document (scenario, graders and dataset) atomically."""
+                    is_demo: bool = False, logical_id: str | None = None, parent_id: str | None = None,
+                    reason: str = "") -> dict[str, Any]:
+    """Validate and store a scenario document (scenario, graders and dataset) atomically.
+
+    ``logical_id``/``parent_id`` make the scenario a new version of an existing one
+    ("edit as new version"); earlier versions are never modified.
+    """
     report = validate_document(raw)
     if not report.ok:
         raise DocumentInvalid(report)
@@ -238,6 +243,7 @@ def import_document(session, project_id: str, raw: Any, *, judges: dict[str, str
     graders = [create_grader_version(session, project_id, spec, judges.get(spec.judge) if spec.judge else None,
                                      is_demo=is_demo) for spec in scenario.graders]
     scenario_row = create_scenario_version(session, project_id, scenario, [g.id for g in graders],
+                                           logical_id=logical_id, parent_id=parent_id, reason=reason,
                                            is_demo=is_demo)
     dataset_row = None
     if report.cases:

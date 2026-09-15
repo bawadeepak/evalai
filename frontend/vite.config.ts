@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 
 const apiPort = process.env.EVAL_TRIAGE_API_PORT ?? '8310'
@@ -16,5 +16,12 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true,
+  },
+  test: {
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.ts'],
+    include: ['src/**/*.test.{ts,tsx}'],
+    // Only the design tokens are loaded as CSS (raw) — by the contrast test.
+    css: { include: [/tokens\.css/] },
   },
 })

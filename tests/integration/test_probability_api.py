@@ -22,12 +22,12 @@ def test_events_quality_and_bin_members(client, ctx):
     project = _project_with_records(ctx)
     events = client.get("/api/v1/probability/events", params={"project_id": project}).json()["data"]
     assert events == [{"event_definition": EVENT, "score_type": "predicted_event_probability",
-                       "method": "judge stated confidence (demo)", "predictions": 80, "labels": 80}]
+                       "method": "judge stated confidence (demo)", "predictions": 160, "labels": 160}]
     quality = client.get("/api/v1/probability/quality", params={"project_id": project, "event_definition": EVENT,
                                                                 "split": "test"}).json()["data"]
-    assert quality["n_records"] == 40 and quality["clusters"] == 20 and quality["is_demo"]
+    assert quality["n_records"] == 80 and quality["clusters"] == 40 and quality["is_demo"]
     raw = quality["raw"]
-    assert len(raw["bins"]) == 10 and sum(b["count"] for b in raw["bins"]) == 40
+    assert len(raw["bins"]) == 10 and sum(b["count"] for b in raw["bins"]) == 80
     assert 0 <= raw["ece"] <= 1 and raw["selective"]["threshold"] == 0.5
     busiest = max(raw["bins"], key=lambda b: b["count"])
     members = client.get("/api/v1/probability/records", params={
@@ -43,13 +43,14 @@ def test_calibration_split_rules_and_fit(client, ctx):
     on_test = client.post("/api/v1/calibrations", json={"project_id": project, "event_definition": EVENT,
                                                         "fit_split": "test"})
     assert on_test.status_code == 422
-    floor = client.post("/api/v1/calibrations", json={"project_id": project, "event_definition": EVENT}).json()["data"]
+    floor = client.post("/api/v1/calibrations", json={"project_id": project, "event_definition": EVENT,
+                                                      "min_clusters": 50}).json()["data"]
     run_all(ctx, seconds=20)
     refused = client.get(f"/api/v1/jobs/{floor['job_id']}").json()["data"]
     assert refused["status"] == "succeeded" and refused["result"]["ok"] is False
-    assert "workflow floor" in refused["result"]["error"]  # 20 calibration clusters < default 30
+    assert "workflow floor" in refused["result"]["error"]  # 40 calibration clusters < requested 50
     started = client.post("/api/v1/calibrations", json={"project_id": project, "event_definition": EVENT,
-                                                        "method": "isotonic", "min_clusters": 20}).json()["data"]
+                                                        "method": "isotonic"}).json()["data"]  # default floor 30
     run_all(ctx, seconds=20)
     job = client.get(f"/api/v1/jobs/{started['job_id']}").json()["data"]
     assert job["result"]["ok"], job
