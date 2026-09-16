@@ -87,9 +87,11 @@ calls `use_models()` (which pins models machine-wide).
 * **Live prerequisites** (for the real backend): the MemoryAI checkout and its
   `.venv`, Ollama with `gemma3:4b`, the cached Hugging Face models
   (`bge-small-en-v1.5`, `ms-marco-MiniLM-L-6-v2`) and a cached `tiktoken`
-  `cl100k_base` encoding (set `EVAL_TRIAGE_TIKTOKEN_CACHE_DIR` if MemoryAI's
-  cache lives elsewhere). The live bridge tests run with
-  `uv run --frozen pytest -m live_memoryai`.
+  `cl100k_base` encoding (see [operations.md](./operations.md#the-bridge-tokenizer)).
+  The live tests — the bridge contract plus M01–M15 through the engine — run
+  with `uv run --frozen pytest -m live_memoryai`. They take a few minutes,
+  create one isolated store per episode and drop every store afterwards.
+  Measured results are in the [validation report](./validation-report.md#live-memoryai-suite-real-runtime).
 
 ## Optional integrations
 

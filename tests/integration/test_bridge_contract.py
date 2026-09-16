@@ -60,8 +60,25 @@ def bridge(request, settings):
     backend, python = request.param
     b = Bridge(settings, backend, python)
     b.start()
-    yield b
-    b.stop()
+    try:
+        yield b
+    finally:
+        _drop_retained_stores(b, settings)
+        b.stop()
+
+
+def _drop_retained_stores(bridge, settings) -> None:
+    """These tests close with ``retain=True`` on purpose; their database is a temporary
+    one, so ``evalai memoryai gc`` would have no record of the stores. Drop them here
+    (ownership-checked) so a live run leaves no Postgres instances behind."""
+    root = settings.memoryai_stores_dir
+    for manifest_path in sorted(root.glob("*/*/.evalai-owned.json")) if root.exists() else []:
+        manifest = json.loads(manifest_path.read_text())
+        try:
+            bridge.call("drop_store", timeout=300, data_dir=str(manifest_path.parent / "data"),
+                        nonce=manifest["nonce"])
+        except BridgeError as exc:  # reported, never fatal: the test's own assertions matter
+            print(f"could not drop {manifest_path.parent}: {exc}")
 
 
 def _prepare(bridge, episode="ep1", stores=("main",), **extra):

@@ -18,7 +18,7 @@ nothing was estimated.
 |---|---|---|
 | A fresh checkout installs, migrates and starts through documented commands | **Verified** (offline) | Fresh-clone rehearsal below |
 | A user without credentials completes the full workflow with a labelled demo adapter | **Verified** | Playwright journey 03 and the smoke suite |
-| A configured user can execute real OpenAI, Anthropic, local OpenAI-compatible and isolated MemoryAI targets | **Implemented, not verified live** | Mock-transport and fake-bridge tests pass; live checks were skipped (see below) |
+| A configured user can execute real OpenAI, Anthropic, local OpenAI-compatible and isolated MemoryAI targets | **Verified** for MemoryAI (real runtime) and the local OpenAI-compatible runner; **not verified live** for OpenAI and Anthropic | Live MemoryAI suite below (it also drove `gemma3:4b` through the local OpenAI-compatible adapter); cloud providers pass mock-transport tests only |
 | Definitions, trials, grades, comparisons, reviews and exports survive restart | **Verified** | `tests/integration/test_restart.py` |
 | Every displayed number has its definition, denominator, eligibility, provenance and unavailable behaviour | **Verified** | `MetricValue` contract tests; Vitest `MetricValue.test.tsx` |
 | All required screens and workflows work; no placeholders or invented measurements | **Verified** for the demo and mocked providers | Playwright smoke per screen and five journeys |
@@ -29,7 +29,9 @@ nothing was estimated.
 
 | Check | Result |
 |---|---|
-| `make test` — pytest (unit + integration) | **210 passed**, 3 deselected (the live MemoryAI variants of the bridge contract, `-m live_memoryai`) |
+| `make test` — pytest (unit + integration) | **210 passed**, 4 deselected (the live MemoryAI tests, run separately with `-m live_memoryai`) |
+| Live MemoryAI — bridge contract (`-m live_memoryai`) | **3 passed** in 76 s against the real runtime |
+| Live MemoryAI — M01–M15 through the engine | **1 passed** in 3 min 25 s; measured outcomes below |
 | `make test` — Vitest | **54 passed** (7 files, including WCAG AA contrast of every text/background token pair in both themes) |
 | `make build` — compile check, ruff, production build | Passed; no bundle-size warning (initial JS 260 kB / 80 kB gzip) |
 | `make test-e2e` — Playwright | **20 passed**: smoke of all 11 screens, detail screens, demo counts from stored grades, provider journey, triage → confirm → promote → rerun → compare → export → import, calibration refusal and valid fit, integrations import, keyboard-only triage, every screen at 375 px without page-level horizontal scroll, collapsed navigation and triage tabs. Every request and response is checked for a planted sentinel secret. |
@@ -51,6 +53,34 @@ directory. Nothing was downloaded: installs ran offline from local caches.
 | `make migrate demo` | Passed |
 | `make start` | Worker healthy in 4 s; both demo runs executed to completion (240/240 and 120/120 trials, `completed_with_errors` by design); UI served; clean shutdown |
 
+### Live MemoryAI suite (real runtime)
+
+The fifteen lifecycle episodes M01–M15 ran against the real MemoryAI runtime
+(commit `d14259d`) in brand-new isolated stores, with `gemma3:4b` on local
+Ollama for both MemoryAI's own model and the `generate` steps, and a cached
+`cl100k_base` tokenizer.
+
+**These are measurements, not expectations.** The test asserts only that every
+episode executed, was graded, captured its evidence and was cleaned up.
+
+| Measure | Result |
+|---|---|
+| Episodes executed | 15 of 15, all trial status `success` |
+| Outcomes | **12 pass, 3 fail**, all 15 resolved (no unresolved or grading errors) |
+| Failing cases | M04 and M12 (mandatory `memory-contract`), M07 (mandatory `answer-checks`) |
+| Episode latency | 0.6 s–71.8 s (M12 slowest; median ≈ 6.7 s) |
+| Isolation | One brand-new store per episode (M10 uses two); all owned, retained, then dropped by `gc` |
+| MemoryAI's own store | Untouched — its pg0 instance (`memoryai-c9cb1f0756`) was never opened, and the protected-instance guard refuses it by construction |
+
+M04 and M12 are the two behaviours the fake backend reproduces as hypotheses
+from source inspection, now observed live: M04's non-Latin text is classified
+as small talk by MemoryAI's Latin-word rule (`all([])` is true), and M12's
+recall exceeds the requested token budget because the facts block is not
+trimmed. M07 failed the answer checks because the local `gemma3:4b` answer did
+not contain the required strings — a generation-model result, not a MemoryAI
+defect. None of these are Eval Triage defects; they are exactly the kind of
+finding the tool exists to surface.
+
 ### Performance sanity check
 
 `python -m eval_triage.testing.perf_check`: 200 cases × 2 candidates × 5
@@ -70,8 +100,7 @@ repeats on the demo adapter, in-process worker loop, one machine.
 
 | Item | Status | Reason |
 |---|---|---|
-| Live MemoryAI suite (real bridge backend; M01–M15 under the real runtime; recorded golden outputs) | **Skipped** | The `tiktoken` `cl100k_base` encoding is not cached on this machine and downloading it was not approved. The fake backend (with MemoryAI's shapes and quirks) and the bridge process tests pass; the three real-backend contract tests are deselected. |
-| Live OpenAI, Anthropic and local Ollama provider checks | **Skipped** by the user's choice (no paid calls) | Adapters are verified against mock transports: request shapes, capability tables, error mapping, retries, auth-header stripping. |
+| Live OpenAI and Anthropic provider checks | **Skipped** by the user's choice (no paid calls) | Adapters are verified against mock transports: request shapes, capability tables, error mapping, retries, auth-header stripping. |
 | `inspect-ai` and `ragas` packages | **Not installed** | Installing or locking them as extras needs a PyPI download, which was not approved. Both importers are verified with recorded synthetic fixtures; the Inspect runner and Ragas grader are verified only against stand-in modules. |
 | Real Promptfoo | **Not exercised** | The suite runner is tested with a stand-in command; import is tested with a synthetic `results.json`. |
 
@@ -87,10 +116,18 @@ repeats on the demo adapter, in-process worker loop, one machine.
   button, backdrop, Escape and focus management.
 * The trial detail showed its outcome as unknown; it now shows the latest
   grading run's outcome.
+* The live bridge contract tests close their stores with `retain=True` (the
+  product retains stores by design) while using a temporary database, so
+  `gc` had no record of them and one Postgres instance was left behind. The
+  tests now drop their own stores through the same ownership checks; the
+  instance left by the first run was dropped the same way.
 
 ## Limitations
 
-* Live provider and live MemoryAI execution were not verified here (above).
+* OpenAI and Anthropic execution was not verified live (above). MemoryAI and
+  the local OpenAI-compatible runner were.
+* The live MemoryAI results are one run of one model (`gemma3:4b`) on one
+  machine: a measurement of that configuration, not a benchmark of MemoryAI.
 * Throughput is bounded by SQLite writes (the worker re-checks run completion
   after every job): about 17.5 trials/s on the demo adapter with one worker.
 * Single user, no authentication; loopback only by design.

@@ -34,7 +34,7 @@ All settings are environment variables (prefix `EVAL_TRIAGE_`); see
 | `MEMORYAI_SOURCE_PATH` | `../memoryai` next to this repository | The MemoryAI checkout |
 | `MEMORYAI_PYTHON` | `<MEMORYAI_SOURCE_PATH>/.venv/bin/python` | Interpreter for the bridge |
 | `EVAL_TRIAGE_MEMORYAI_HF_OFFLINE` | `true` | Hugging Face offline inside the bridge (nothing is downloaded implicitly) |
-| `EVAL_TRIAGE_TIKTOKEN_CACHE_DIR` | unset | An existing tiktoken cache for the bridge |
+| `EVAL_TRIAGE_TIKTOKEN_CACHE_DIR` | unset | An existing tiktoken cache for the bridge (see below) |
 | `EVAL_TRIAGE_PROMPTFOO_COMMAND` / `EVAL_TRIAGE_PROMPTFOO_WORKDIR` | unset | Enable the Promptfoo suite runner |
 | `EVAL_TRIAGE_PROMPTFOO_TIMEOUT_SECONDS` | `900` | Suite timeout |
 | `EVAL_TRIAGE_FRONTEND_DIST` | `frontend/dist` | Built UI served by the API |
@@ -57,6 +57,22 @@ included; text redaction is optional). Imports always create a new project.
 
 **Migrations** run automatically on `make start` and `make migrate` (Alembic;
 revisions in `backend/eval_triage/db/migrations/versions/`).
+
+**The bridge tokenizer.** MemoryAI's recall budget uses tiktoken's
+`cl100k_base` encoding, and the bridge runs offline: it never downloads one.
+Populate a stable cache once with MemoryAI's interpreter and point Eval Triage
+at it (a ~1.7 MB one-time download):
+
+```bash
+TIKTOKEN_CACHE_DIR=~/.cache/tiktoken /path/to/memoryai/.venv/bin/python -c "import tiktoken; tiktoken.get_encoding('cl100k_base')"
+```
+
+```bash
+export EVAL_TRIAGE_TIKTOKEN_CACHE_DIR=~/.cache/tiktoken
+```
+
+Without it, real-backend MemoryAI episodes fail at the first recall. The
+default location is a temporary directory that the operating system may clear.
 
 **MemoryAI stores** are retained for inspection. Settings shows their disk
 usage. `uv run --frozen evalai memoryai gc` lists what would be dropped;
