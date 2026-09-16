@@ -5,6 +5,7 @@
 | Command | What it does |
 |---|---|
 | `make setup` | Install locked Python (`uv sync --frozen`) and frontend (`npm ci`) dependencies, and the Playwright Chromium browser |
+| `uv sync --extra inspect --extra ragas` | Add the optional integration extras (see [adapters.md](./adapters.md#optional-integrations)) |
 | `make migrate` | Create or upgrade the database (`evalai migrate`) |
 | `make demo` | Seed the clearly labelled demo project (idempotent); a running worker executes its runs |
 | `make dev` | API with reload, a worker and the Vite dev UI on http://127.0.0.1:8311 |

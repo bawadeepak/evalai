@@ -12,6 +12,7 @@ runner reports itself unavailable.
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -161,11 +162,26 @@ def capabilities(settings=None) -> dict[str, Any]:
                     "reason": None if installed else f"inspect_ai is not installed ({INSTALL})"}}
 
 
+def task_spec(task: str) -> str:
+    """Inspect resolves task files relative to the working directory and treats an
+    absolute path as a glob pattern (which it rejects). Convert ``/abs/file.py@name``
+    to a relative spec when we can; anything else is passed through untouched."""
+    path, separator, name = task.partition("@")
+    candidate = Path(path)
+    if not (candidate.is_absolute() and candidate.exists()):
+        return task
+    try:
+        relative = os.path.relpath(candidate, Path.cwd())
+    except ValueError:  # e.g. a different drive on Windows: let Inspect decide
+        return task
+    return f"{relative}{separator}{name}" if separator else relative
+
+
 def run_task(task: str, model: str, log_dir: Path, limit: int | None = None) -> bytes:
     """Run an Inspect task and return its JSON log. Needs inspect_ai; makes model calls."""
     inspect_ai = require("inspect_ai", INSTALL)
     log_dir.mkdir(parents=True, exist_ok=True)
-    logs = inspect_ai.eval(task, model=model, log_dir=str(log_dir), log_format="json", limit=limit)
+    logs = inspect_ai.eval(task_spec(task), model=model, log_dir=str(log_dir), log_format="json", limit=limit)
     if not logs:
         raise PluginInputError("Inspect returned no log")
     location = getattr(logs[0], "location", None)

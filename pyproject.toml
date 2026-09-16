@@ -16,11 +16,25 @@ dependencies = [
     "numpy>=2.0",
     "scipy>=1.14",
     "scikit-learn>=1.5",
-    "openai>=1.50",
+    # Pinned at the version the adapter was built and validated against; an
+    # optional extra must never silently downgrade a core SDK.
+    "openai>=3.14",
     "anthropic>=0.40",
     "pyyaml>=6.0",
     "jsonschema>=4.23",
 ]
+
+[project.optional-dependencies]
+# Optional integrations. The core application never imports these; each reports
+# itself unavailable when its extra is not installed.
+#   uv sync --extra inspect --extra ragas
+inspect = ["inspect-ai>=0.3"]
+# Ragas 0.3+ pulls instructor, which caps openai below 2.0 and would downgrade
+# the core SDK; 0.3/0.4 also import langchain_community.chat_models.vertexai,
+# which current langchain-community no longer ships. 0.2.x resolves against the
+# pinned openai and the langchain-community release that still provides it.
+# rapidfuzz is what Ragas's non-LLM string/context metrics need at runtime.
+ragas = ["ragas>=0.2,<0.3", "langchain-community<0.4", "rapidfuzz>=3.9"]
 
 [project.scripts]
 evalai = "eval_triage.cli:main"

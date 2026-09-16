@@ -106,10 +106,19 @@ def module_version(name: str) -> str | None:
 
 
 def require(module: str, install: str):
-    """Import an optional dependency or raise PluginUnavailable with install guidance."""
+    """Import an optional dependency, or raise PluginUnavailable with the reason.
+
+    An installed package can still fail to import (a broken or incompatible
+    dependency tree of its own). That is an unavailable plugin with an
+    explanation, never a grading error.
+    """
     if not module_available(module):
         raise PluginUnavailable(f"{module} is not installed ({install})")
-    return importlib.import_module(module)
+    try:
+        return importlib.import_module(module)
+    except Exception as exc:  # noqa: BLE001 - any import failure means "unavailable", with its reason
+        raise PluginUnavailable(
+            f"{module} is installed but cannot be imported: {type(exc).__name__}: {exc}") from exc
 
 
 @dataclass(frozen=True)

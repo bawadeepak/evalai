@@ -129,7 +129,7 @@ MemoryAI was verified live: all fifteen lifecycle episodes ran against the real
 runtime in isolated stores (12 passed, 3 failed — two of them the known
 small-talk and recall-budget behaviours), driving `gemma3:4b` through the local
 OpenAI-compatible adapter. OpenAI and Anthropic execution is implemented and
-tested against mock transports but was not run live (no paid calls), and the
-optional `inspect-ai` and `ragas` packages are not installed. Details, and
-everything else that was and was not verified, are in the
+tested against mock transports but was not run live (no paid calls). The
+optional Inspect and Ragas extras are installed and verified against the real
+packages. Details, and everything else that was and was not verified, are in the
 [validation report](docs/validation-report.md).

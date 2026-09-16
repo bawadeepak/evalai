@@ -32,6 +32,7 @@ nothing was estimated.
 | `make test` — pytest (unit + integration) | **210 passed**, 4 deselected (the live MemoryAI tests, run separately with `-m live_memoryai`) |
 | Live MemoryAI — bridge contract (`-m live_memoryai`) | **3 passed** in 76 s against the real runtime |
 | Live MemoryAI — M01–M15 through the engine | **1 passed** in 3 min 25 s; measured outcomes below |
+| Optional extras against their real packages | **2 passed** — a real Inspect task run and log import, and Ragas scoring through the grader (details below) |
 | `make test` — Vitest | **54 passed** (7 files, including WCAG AA contrast of every text/background token pair in both themes) |
 | `make build` — compile check, ruff, production build | Passed; no bundle-size warning (initial JS 260 kB / 80 kB gzip) |
 | `make test-e2e` — Playwright | **20 passed**: smoke of all 11 screens, detail screens, demo counts from stored grades, provider journey, triage → confirm → promote → rerun → compare → export → import, calibration refusal and valid fit, integrations import, keyboard-only triage, every screen at 375 px without page-level horizontal scroll, collapsed navigation and triage tabs. Every request and response is checked for a planted sentinel secret. |
@@ -81,6 +82,30 @@ not contain the required strings — a generation-model result, not a MemoryAI
 defect. None of these are Eval Triage defects; they are exactly the kind of
 finding the tool exists to surface.
 
+### Optional extras (Inspect AI and Ragas)
+
+Installed with `uv sync --extra inspect --extra ragas` and locked:
+**inspect-ai 0.3.263**, **ragas 0.2.15**, langchain-community 0.3.31,
+rapidfuzz 3.14.6. Verified against the real packages (offline):
+
+| Check | Result |
+|---|---|
+| Inspect task run and log import | A task ran against Inspect's built-in `mockllm/model` and the JSON log imported with upstream run, task and sample ids and per-sample scores |
+| Ragas grader | `ExactMatch` scored through the grader: 1.0 passes a declared threshold, 0.0 fails it, and a score with no threshold is reported as "not a binary verdict" rather than a pass |
+| Ragas LLM metrics | `Faithfulness` is refused with a reason (no evaluator LLM is wired into Ragas) |
+| Non-LLM metric availability | `NonLLMContextRecall`, `NonLLMContextPrecisionWithReference`, `NonLLMStringSimilarity` and `ExactMatch` all construct (they need `rapidfuzz`, which the extra now pins) |
+
+**Version constraints, and why.** Ragas 0.3 and 0.4 cannot be used here:
+they depend on `instructor`, which caps `openai` below 2.0 and would downgrade
+the core SDK this application was built and validated against (uv proves
+`openai>=3.14` and `ragas>=0.4` unsatisfiable), and both import
+`langchain_community.chat_models.vertexai`, which current langchain-community
+no longer ships. The extra therefore pins `ragas>=0.2,<0.3` with
+`langchain-community<0.4`. The core `openai` floor was raised to `>=3.14` so no
+optional extra can silently downgrade it; installing the extras moved only
+`openai` 3.14.0 → 3.14.1 (a patch release) and left every other core pin
+unchanged.
+
 ### Performance sanity check
 
 `python -m eval_triage.testing.perf_check`: 200 cases × 2 candidates × 5
@@ -101,7 +126,6 @@ repeats on the demo adapter, in-process worker loop, one machine.
 | Item | Status | Reason |
 |---|---|---|
 | Live OpenAI and Anthropic provider checks | **Skipped** by the user's choice (no paid calls) | Adapters are verified against mock transports: request shapes, capability tables, error mapping, retries, auth-header stripping. |
-| `inspect-ai` and `ragas` packages | **Not installed** | Installing or locking them as extras needs a PyPI download, which was not approved. Both importers are verified with recorded synthetic fixtures; the Inspect runner and Ragas grader are verified only against stand-in modules. |
 | Real Promptfoo | **Not exercised** | The suite runner is tested with a stand-in command; import is tested with a synthetic `results.json`. |
 
 ## Defects found and fixed during validation
@@ -116,6 +140,12 @@ repeats on the demo adapter, in-process worker loop, one machine.
   button, backdrop, Escape and focus management.
 * The trial detail showed its outcome as unknown; it now shows the latest
   grading run's outcome.
+* An optional package that is installed but cannot be imported (Ragas 0.3/0.4
+  against current langchain-community) produced a grading *error*; it is now
+  reported as unavailable with the upstream reason.
+* The Inspect runner passed an absolute task path straight to Inspect, which
+  resolves task files relative to the working directory and rejected it as a
+  glob pattern; absolute specs are now normalised.
 * The live bridge contract tests close their stores with `retain=True` (the
   product retains stores by design) while using a temporary database, so
   `gc` had no record of them and one Postgres instance was left behind. The
@@ -132,7 +162,8 @@ repeats on the demo adapter, in-process worker loop, one machine.
   after every job): about 17.5 trials/s on the demo adapter with one worker.
 * Single user, no authentication; loopback only by design.
 * Ragas LLM-based metrics are unsupported (no evaluator LLM is wired into
-  Ragas); only non-LLM metrics run.
+  Ragas); only non-LLM metrics run. Ragas is pinned below 0.3 because newer
+  releases conflict with the core OpenAI SDK (above).
 * Imported external results are viewable and exportable but are not converted
   into Eval Triage datasets or runs; text-redacted exports omit them.
 * Accessibility automation covers token contrast, keyboard-only triage and

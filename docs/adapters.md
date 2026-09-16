@@ -101,8 +101,21 @@ reason when its prerequisite is missing (Settings › External results).
 | Integration | Built in | Needs |
 |---|---|---|
 | **Promptfoo** | Import of `promptfoo eval -o results.json` files: assertion types, pass/fail, reasons and errors are kept with provenance; Promptfoo's score is recorded as a score, never a probability. | Running suites: `EVAL_TRIAGE_PROMPTFOO_COMMAND` (an existing local promptfoo command) and `EVAL_TRIAGE_PROMPTFOO_WORKDIR` (configs must live inside it). Eval Triage never installs promptfoo. |
-| **Inspect AI** | Import of Inspect JSON eval logs (`--log-format json` or `inspect log convert --to json`): run, task and sample ids and epochs are kept; C/I/P/N letters and numeric scores are kept as reported. | Running tasks: the `inspect_ai` package in this environment. |
-| **Ragas** | — | The `ragas` package. Used as an external grader (`kind: external`, `config.plugin: ragas`) for non-LLM metrics; results record the Ragas version, metric definition and judge configuration. LLM-based metrics are reported unavailable. A numeric score yields a verdict only with a declared threshold. |
+| **Inspect AI** | Import of Inspect JSON eval logs (`--log-format json` or `inspect log convert --to json`): run, task and sample ids and epochs are kept; C/I/P/N letters and numeric scores are kept as reported. | Running tasks: the `[inspect]` extra. Task specs are resolved by Inspect relative to the working directory; absolute paths are normalised for you. |
+| **Ragas** | — | The `[ragas]` extra. Used as an external grader (`kind: external`, `config.plugin: ragas`) for non-LLM metrics; results record the Ragas version, metric definition and judge configuration. LLM-based metrics are reported unavailable. A numeric score yields a verdict only with a declared threshold. |
+
+Install the optional extras with:
+
+```bash
+uv sync --extra inspect --extra ragas
+```
+
+Ragas is pinned to `>=0.2,<0.3` with `langchain-community<0.4` and
+`rapidfuzz`: newer Ragas releases depend on `instructor`, which caps `openai`
+below 2.0 and would downgrade the core SDK, and they import a
+langchain-community module that no longer exists. A package that is installed
+but cannot be imported is reported as *unavailable with its reason*, never as a
+grading error.
 
 Imported results are immutable, keep the original file as an artifact (stored
 redacted if it contains secret-like values) and travel with project export and
