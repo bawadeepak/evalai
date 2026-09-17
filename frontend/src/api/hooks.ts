@@ -103,12 +103,18 @@ export function useTargets(projectId: string | null) {
   })
 }
 
+// A queued job can reach its terminal state while the window is hidden or the user is in another tab.
+// These polls wait for that state, so they keep running in the background: otherwise the finished
+// result never arrives and the panel stays pending until a manual reload.
+const AWAIT_TERMINAL = { refetchIntervalInBackground: true } as const
+
 export function useConnectionTest(id: string | null) {
   return useQuery({
     queryKey: ['connection-test', id],
     queryFn: () => data(api.get<ConnectionTest>(`/connection-tests/${id}`)),
     enabled: !!id,
     refetchInterval: (query) => (query.state.data && !['queued', 'running'].includes(query.state.data.status) ? false : 1000),
+    ...AWAIT_TERMINAL,
   })
 }
 
@@ -221,6 +227,7 @@ export function useJob(id: string | null) {
     queryFn: () => data(api.get<Job>(`/jobs/${id}`)),
     enabled: !!id,
     refetchInterval: (query) => (query.state.data && !['queued', 'running'].includes(query.state.data.status) ? false : 800),
+    ...AWAIT_TERMINAL,
   })
 }
 
@@ -267,5 +274,6 @@ export function useExports(projectId: string | null) {
     queryFn: () => data(api.get<ExportRecord[]>('/exports', { project_id: projectId })),
     enabled: !!projectId,
     refetchInterval: (query) => (query.state.data?.some((e) => ['queued', 'running'].includes(e.status)) ? 1000 : false),
+    ...AWAIT_TERMINAL,
   })
 }

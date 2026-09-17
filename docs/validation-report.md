@@ -29,11 +29,11 @@ nothing was estimated.
 
 | Check | Result |
 |---|---|
-| `make test` — pytest (unit + integration) | **210 passed**, 4 deselected (the live MemoryAI tests, run separately with `-m live_memoryai`) |
+| `make test` — pytest (unit + integration) | **211 passed**, 1 skipped, 4 deselected (the live MemoryAI tests, run separately with `-m live_memoryai`) |
 | Live MemoryAI — bridge contract (`-m live_memoryai`) | **3 passed** in 76 s against the real runtime |
 | Live MemoryAI — M01–M15 through the engine | **1 passed** in 3 min 25 s; measured outcomes below |
 | Optional extras against their real packages | **2 passed** — a real Inspect task run and log import, and Ragas scoring through the grader (details below) |
-| `make test` — Vitest | **54 passed** (7 files, including WCAG AA contrast of every text/background token pair in both themes) |
+| `make test` — Vitest | **56 passed** (8 files, including WCAG AA contrast of every text/background token pair in both themes, and which polls keep running while the page is hidden) |
 | `make build` — compile check, ruff, production build | Passed; no bundle-size warning (initial JS 260 kB / 80 kB gzip) |
 | `make test-e2e` — Playwright | **20 passed**: smoke of all 11 screens, detail screens, demo counts from stored grades, provider journey, triage → confirm → promote → rerun → compare → export → import, calibration refusal and valid fit, integrations import, keyboard-only triage, every screen at 375 px without page-level horizontal scroll, collapsed navigation and triage tabs. Every request and response is checked for a planted sentinel secret. |
 | Reference mathematics (`docs/test_metrics.py`) | 12 passed |
@@ -151,6 +151,19 @@ repeats on the demo adapter, in-process worker loop, one machine.
   `gc` had no record of them and one Postgres instance was left behind. The
   tests now drop their own stores through the same ownership checks; the
   instance left by the first run was dropped the same way.
+* A job the user waits on (a calibration fit, a connection test, an export)
+  stopped being polled while the page was hidden, because the query client
+  disables window-focus refetching and the interval pauses on a hidden
+  document. The job finished, but its result never reached the screen until a
+  manual reload. Those three polls now continue in the background; the progress
+  polls (health, runs, one run) deliberately still pause, so a hidden tab does
+  not stream requests for ever. Found by walking the demo journey by hand — the
+  browser tests never saw it because their page is always visible.
+* The end-to-end integrations test asserted that Inspect and Ragas were *not*
+  installed. Installing the extras made that false and the test failed; it was
+  not caught then because the browser suite was not re-run after the install.
+  It now asserts the case this server controls: the Promptfoo runner is
+  unavailable with its reason.
 
 ## Limitations
 

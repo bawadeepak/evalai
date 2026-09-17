@@ -13,8 +13,12 @@ test('import Promptfoo results and inspect upstream verdicts', async ({ page }) 
   await expect(plugins).toContainText('Promptfoo')
   await expect(plugins).toContainText('Inspect AI')
   await expect(plugins).toContainText('Ragas')
-  await expect(plugins).toContainText('run unavailable') // inspect_ai is not installed
-  await expect(plugins).toContainText('grade unavailable') // ragas is not installed
+  // A missing prerequisite is shown as unavailable with its reason. Promptfoo's runner is the stable
+  // case: this server configures no promptfoo command. Whether the optional Inspect and Ragas extras
+  // are installed depends on the environment, so their state is deliberately not asserted here.
+  const promptfoo = plugins.locator('article', { hasText: 'Promptfoo' })
+  await expect(promptfoo).toContainText('run unavailable')
+  await expect(promptfoo).toContainText('set EVAL_TRIAGE_PROMPTFOO_COMMAND')
 
   await page.getByLabel('Format').selectOption('promptfoo')
   await page.locator('#external-file').setInputFiles(PROMPTFOO_FIXTURE)
